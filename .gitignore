@@ -1,0 +1,38 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# testing
+coverage
+*.tsbuildinfo
+
+# next.js
+.next
+out
+
+# production
+build
+dist
+
+# misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# git
+.git
+.GITIGNORE.bak
+
+# scripts
+.claude/checkup.log

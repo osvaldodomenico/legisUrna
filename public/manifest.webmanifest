@@ -1,0 +1,10 @@
+{
+  "name": "LegisUrna — Simulador de Votação 2026 (não oficial)",
+  "short_name": "LegisUrna",
+  "description": "Simulação não oficial do fluxo de votação das Eleições Gerais 2026. Não pertence ao TSE.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0369a1",
+  "icons": []
+}
