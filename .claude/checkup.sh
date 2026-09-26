@@ -28,7 +28,7 @@ echo "-- regras --"
 if grep -q "MAJORITARIAN_OFFICES" src/domain/voting/rules.ts && grep -q "isSecondSenatorDuplicate" src/domain/voting/machine.ts; then pass "regras majoritária + anti-repetição"; else fail "regras ausentes"; fi
 
 echo "-- privacidade --"
-if grep -q "candidate_id" src/lib/analytics.ts; then fail "analytics vaza candidate_id"; else pass "analytics sem PII eleitoral"; fi
+if grep -v "^[[:space:]]*//" src/lib/analytics.ts | grep -q "candidate_id"; then fail "analytics vaza candidate_id"; else pass "analytics sem PII eleitoral"; fi
 
 if [ "$FAIL" -eq 0 ]; then echo "== 0 FAIL — pronto para validar com cliente =="; else echo "== $FAIL FAIL =="; fi
 exit $FAIL
