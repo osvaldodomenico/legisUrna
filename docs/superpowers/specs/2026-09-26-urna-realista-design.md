@@ -31,7 +31,7 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
 
 ### 4.1 `UrnaShell` (apresentação pura)
 - Props: `screen: ReactNode`, `keypad?: ReactNode`, `size?: "full" | "display"`.
-- Renderiza o corpo físico: base bege (`--urna-body`) com gradiente e sombra, moldura escura da tela (`--urna-bezel`), painel preto do teclado (`--urna-panel`) com o rótulo **SIMULADOR** acima das teclas, aberturas de ventilação (fileira de ranhuras) na borda frontal.
+- Renderiza o corpo físico: base bege (`--urna-body`) com gradiente e sombra, moldura escura da tela (`--urna-bezel`), painel preto do teclado (`--urna-panel`; o rótulo **SIMULADOR** acima das teclas é renderizado pelo `UrnaKeypad`, que o painel sempre contém), aberturas de ventilação (fileira de ranhuras) na borda frontal.
 - Layout: em `≥ 768px` tela à esquerda (≈ 60 %) e painel do teclado à direita (≈ 40 %), lado a lado; em `< 768px` empilhado (tela em cima ocupando a largura toda, teclado embaixo).
 - `size="display"`: versão sem interação para a landing. Quando `keypad` é omitido, o próprio `UrnaShell` renderiza `UrnaKeypad` com handlers vazios e `decorative` (teclas com `aria-hidden`, `tabIndex=-1`, `pointer-events: none`). A página não precisa passar teclado.
 - `UrnaShell` é `"use client"` (cria os handlers vazios internamente); a landing, que é server component, passa só `screen` (ReactNode) e `size`.
@@ -156,7 +156,7 @@ Componentes que ficam sem uso e são removidos: `VotingScreen.tsx`, `NumericKeyp
    - `UrnaScreen.tsx` contém "NÚMERO ERRADO", "VOTO EM BRANCO", "FIM" e "SEU VOTO PARA";
    - nenhum arquivo em `src/components/urna/` contém "TSE", "Justiça Eleitoral" ou "brasão" (`grep -rw`, sensível a maiúsculas; a urna não usa a marca; menções informativas em `layout.tsx`, `page.tsx`, dados e páginas de texto continuam permitidas);
    - privacidade: `analytics.ts` sem `candidate_id` fora de comentários (regra atual).
-3. Verificação visual local (`pnpm dev`): as seis telas (espera, digitando, candidato, nulo, branco, FIM) em 1280 px e em 390 px, com screenshots salvos em `docs/superpowers/specs/screenshots/` para o histórico.
+3. Verificação visual local (`pnpm dev`): as seis telas (espera, digitando, candidato, nulo, branco, FIM) em 1280 px e em 390 px, com screenshots salvos em `docs/superpowers/specs/screenshots/` para o histórico. Sem Playwright no projeto, o executor gera por Chrome headless só as telas alcançáveis por URL (landing e espera); as quatro telas interativas são conferidas por Domenico com um roteiro e ele salva os screenshots na mesma pasta.
 4. Deploy pelo procedimento registrado (build com `--memory=3g` na VPS BI, tag `legisurna:<sha>`, `docker run` com as labels do Traefik) e smoke em produção: rotas 200, `/simular/SP/fim` → 404, aviso presente, `noindex` em `/votar`.
 
 ## 8. Fora de escopo (explicitamente)
