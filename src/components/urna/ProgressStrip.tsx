@@ -11,7 +11,7 @@ export function ProgressStrip({ offices, currentIndex, finished = false }: Props
   const total = offices.length;
   const step = finished ? total : currentIndex + 1;
   return (
-    <nav aria-label="Progresso da votação" className="w-full max-w-[980px]">
+    <div role="group" aria-label="Progresso da votação" className="w-full max-w-[980px]">
       <ol className="hidden flex-wrap items-center gap-x-3 gap-y-1 text-xs md:flex">
         {offices.map((o, i) => {
           const done = finished || i < currentIndex;
@@ -45,6 +45,6 @@ export function ProgressStrip({ offices, currentIndex, finished = false }: Props
           <div className="h-full rounded-full bg-emerald-700 transition-all" style={{ width: `${(step / total) * 100}%` }} />
         </div>
       </div>
-    </nav>
+    </div>
   );
 }

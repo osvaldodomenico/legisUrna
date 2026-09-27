@@ -28,10 +28,11 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   const [started, setStarted] = useState(false);
   const [pressedKey, setPressedKey] = useState<KeyId | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restartButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const office = currentOffice(offices, currentIndex);
   const stateName = STATES.find((s) => s.code === stateCode)?.name ?? null;
-  const finished = status === "FINISHED";
+  const finished = started && status === "FINISHED";
   const view = toScreenView({ started, stateName, status, office, digits, foundCandidate });
 
   const flash = useCallback((k: KeyId) => {
@@ -40,6 +41,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
     flashTimer.current = setTimeout(() => setPressedKey(null), FLASH_MS);
   }, []);
   useEffect(() => () => { if (flashTimer.current) clearTimeout(flashTimer.current); }, []);
+  useEffect(() => { if (finished) restartButtonRef.current?.focus(); }, [finished]);
 
   // --- ações (compartilhadas entre teclado virtual e físico) ---
   const onDigit = useCallback((d: string) => {
@@ -93,6 +95,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   // --- teclado físico ---
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      if (e.repeat) return;
       if (finished) return; // Enter/Espaço devem continuar ativando os botões abaixo da urna
       if (e.ctrlKey || e.metaKey || e.altKey) return; // atalhos do navegador (Cmd+B, Cmd+1…)
       const tag = (e.target as HTMLElement | null)?.tagName;
@@ -121,7 +124,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   return (
     <div className="mx-auto flex w-full max-w-[980px] flex-1 flex-col items-center gap-4 px-4 py-4">
       <ProgressStrip offices={offices} currentIndex={currentIndex} finished={finished} />
-      <p className="sr-only" role="status" aria-live="assertive">{live}{message ? ` ${message}` : ""}</p>
+      <p className="sr-only" role="alert">{live}{message ? ` ${message}` : ""}</p>
 
       <UrnaShell
         screen={<UrnaScreen view={view} message={message} />}
@@ -139,7 +142,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
 
       {finished && (
         <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
-          <button type="button" onClick={onRestart} className="urna-key urna-key--fn urna-key--confirma flex-1 !text-base">
+          <button ref={restartButtonRef} type="button" onClick={onRestart} className="urna-key urna-key--fn urna-key--confirma flex-1 !text-base">
             Votar novamente
           </button>
           <Link href="/" className="urna-key urna-key--fn urna-key--branco flex flex-1 items-center justify-center !text-base">

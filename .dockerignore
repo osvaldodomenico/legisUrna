@@ -8,3 +8,7 @@ Simulador_Votacao_2026_Documentacao.md
 *.log
 coverage
 .DS_Store
+
+# screenshots/mockups fora do contexto de build
+docs
+.superpowers

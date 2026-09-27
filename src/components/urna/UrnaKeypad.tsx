@@ -33,6 +33,7 @@ export function UrnaKeypad({ onDigit, onBlank, onCorrect, onConfirm, confirmEnab
             className={cls(d, d === "0" ? " urna-key--zero" : "")}
             aria-label={`Tecla ${d}`}
             onClick={() => onDigit(d)}
+            onPointerDown={(e) => e.preventDefault()}
             {...common}
           >
             {d}
@@ -40,10 +41,10 @@ export function UrnaKeypad({ onDigit, onBlank, onCorrect, onConfirm, confirmEnab
         ))}
       </div>
       <div className="urna__fn">
-        <button type="button" className={cls("BRANCO", " urna-key--fn urna-key--branco")} aria-label="Branco" onClick={onBlank} {...common}>
+        <button type="button" className={cls("BRANCO", " urna-key--fn urna-key--branco")} aria-label="Branco" onClick={onBlank} onPointerDown={(e) => e.preventDefault()} {...common}>
           BRANCO
         </button>
-        <button type="button" className={cls("CORRIGE", " urna-key--fn urna-key--corrige")} aria-label="Corrige" onClick={onCorrect} {...common}>
+        <button type="button" className={cls("CORRIGE", " urna-key--fn urna-key--corrige")} aria-label="Corrige" onClick={onCorrect} onPointerDown={(e) => e.preventDefault()} {...common}>
           CORRIGE
         </button>
         <button
@@ -52,6 +53,7 @@ export function UrnaKeypad({ onDigit, onBlank, onCorrect, onConfirm, confirmEnab
           aria-label="Confirma"
           aria-disabled={!confirmEnabled}
           onClick={onConfirm}
+          onPointerDown={(e) => e.preventDefault()}
           {...common}
         >
           CONFIRMA
