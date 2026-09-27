@@ -1,7 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { sfx, setMuted, isMuted, subscribeMuted } from "@/lib/audio";
 
 describe("audio", () => {
+  beforeEach(() => setMuted(false));
+
   it("começa sem mudo e alterna", () => {
     expect(isMuted()).toBe(false);
     setMuted(true);

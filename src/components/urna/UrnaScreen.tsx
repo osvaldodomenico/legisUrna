@@ -22,11 +22,11 @@ export function UrnaScreen({ view, message }: { view: ScreenView; message?: stri
         <div className="urna__screen-inner" key={view.kind}>
           {view.kind === "idle" && (
             <>
-              <div className="urna__center" style={{ paddingBottom: "10%" }}>
+              <div className="urna__center urna__idle">
                 SIMULADOR DE VOTAÇÃO
                 <br />
                 2026
-                <div style={{ fontSize: "0.6em", fontWeight: 400, marginTop: "1em" }}>
+                <div className="urna__idle-sub">
                   {view.stateName ? <>Estado: <b>{view.stateName}</b></> : "Escolha seu estado"}
                 </div>
               </div>
@@ -47,8 +47,9 @@ export function UrnaScreen({ view, message }: { view: ScreenView; message?: stri
             <>
               <div className="urna__title">SEU VOTO PARA</div>
               <div className="urna__office">{view.office.label}</div>
-              <DigitBoxes digits={view.digits} total={view.office.digits} />
-              <CandidatePanel candidate={view.candidate} office={view.office} />
+              <CandidatePanel candidate={view.candidate} office={view.office}>
+                <DigitBoxes digits={view.digits} total={view.office.digits} />
+              </CandidatePanel>
               {bar(BAR_CONFIRM)}
             </>
           )}

@@ -22,7 +22,7 @@ export function UrnaShell({ screen, keypad, size = "full" }: Props) {
         <UrnaKeypad onDigit={noop} onBlank={noop} onCorrect={noop} onConfirm={noop} confirmEnabled decorative />
       )}
       <div className="urna__vents" aria-hidden>
-        {Array.from({ length: 9 }, (_, n) => <i key={n} />)}
+        {Array.from({ length: 9 }, (_, n) => <span key={n} />)}
       </div>
     </div>
   );
