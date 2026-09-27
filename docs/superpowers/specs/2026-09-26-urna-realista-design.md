@@ -33,30 +33,33 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
 - Props: `screen: ReactNode`, `keypad?: ReactNode`, `size?: "full" | "display"`.
 - Renderiza o corpo físico: base bege (`--urna-body`) com gradiente e sombra, moldura escura da tela (`--urna-bezel`), painel preto do teclado (`--urna-panel`) com o rótulo **SIMULADOR** acima das teclas, aberturas de ventilação (fileira de ranhuras) na borda frontal.
 - Layout: em `≥ 768px` tela à esquerda (≈ 60 %) e painel do teclado à direita (≈ 40 %), lado a lado; em `< 768px` empilhado (tela em cima ocupando a largura toda, teclado embaixo).
-- `size="display"`: versão sem interação para a landing (keypad decorativo, teclas com `aria-hidden`, `pointer-events: none`).
+- `size="display"`: versão sem interação para a landing. Quando `keypad` é omitido, o próprio `UrnaShell` renderiza `UrnaKeypad` com handlers vazios e `decorative` (teclas com `aria-hidden`, `tabIndex=-1`, `pointer-events: none`). A página não precisa passar teclado.
 - Não conhece estado de votação.
 
 ### 4.2 `UrnaScreen` (apresentação pura)
-- Props: `view: ScreenView` onde
+- Props: `view: ScreenView`, `message?: string | null` onde
   ```ts
   type ScreenView =
-    | { kind: "idle"; stateName: string }
-    | { kind: "typing"; officeLabel: string; digits: string; totalDigits: number }
-    | { kind: "candidate"; officeLabel: string; digits: string; totalDigits: number; candidate: Candidate; office: OfficeConfig }
-    | { kind: "null"; officeLabel: string; digits: string; totalDigits: number }
-    | { kind: "blank"; officeLabel: string }
+    | { kind: "idle"; stateName: string | null }          // null → linha "Escolha seu estado" (landing)
+    | { kind: "typing"; office: OfficeConfig; digits: string }
+    | { kind: "candidate"; office: OfficeConfig; digits: string; candidate: Candidate }
+    | { kind: "null"; office: OfficeConfig; digits: string }
+    | { kind: "invalid"; office: OfficeConfig; digits: string }   // só com enableNull=false
+    | { kind: "blank"; office: OfficeConfig }
     | { kind: "finished" }
   ```
+  `officeLabel` vem de `office.label`; `totalDigits` de `office.digits`. `stateName` vem de `STATES` (`src/data/states`) a partir do `stateCode` do store; o contêiner faz essa busca.
 - Área 4:3, fundo `--urna-screen` (#f4f4ef), fonte Arial, texto `#111`, sempre modo claro (`color-scheme: light` no contêiner; a tela é um objeto físico e não segue o tema da página).
 - Conteúdo por `kind`:
-  - `idle`: "SIMULADOR DE VOTAÇÃO 2026", "Estado: {stateName}", barra: "Aperte a tecla VERDE para iniciar a simulação."
+  - `idle`: "SIMULADOR DE VOTAÇÃO 2026"; linha "Estado: {stateName}" quando há estado, ou "Escolha seu estado" quando `stateName` é `null`; barra: "Aperte a tecla VERDE para iniciar a simulação."
   - `typing`: cabeçalho "SEU VOTO PARA" + `officeLabel`; `DigitBoxes`; barra: "Digite o número do candidato." / "Para votar em branco, aperte a tecla BRANCO."
   - `candidate`: cabeçalho + `DigitBoxes` (preenchidas) + `CandidatePanel`; barra: "Aperte a tecla:" / "VERDE para CONFIRMAR este voto" / "LARANJA para REINICIAR este voto".
   - `null`: cabeçalho + `DigitBoxes` + texto central "NÚMERO ERRADO" / "VOTO NULO"; barra igual à de `candidate`.
+  - `invalid` (status `INVALID_NUMBER`, só quando `enableNull=false`): cabeçalho + `DigitBoxes` + texto central "NÚMERO NÃO CADASTRADO"; barra: "Aperte a tecla LARANJA para corrigir." (CONFIRMA está bloqueado pelo store nesse estado). Hoje `enableNull` é fixo em `true`, então esta view é defensiva.
   - `blank`: cabeçalho + texto central "VOTO EM BRANCO"; barra igual à de `candidate`.
   - `finished`: "FIM" grande centralizado; rodapé pequeno "Simulação encerrada. Nenhum voto foi gravado ou enviado."
 - Transição entre `kind`s: fade curto (≤ 150 ms) via CSS; desligado com reduced-motion.
-- Mensagem de bloqueio do store (`message`, ex.: repetição de senador) é exibida **na barra inferior da tela**, substituindo o texto padrão enquanto existir.
+- Quando `message` (texto de bloqueio do store, ex.: repetição de senador) não é vazio, ele substitui o texto padrão da barra inferior, em negrito, enquanto existir. `UrnaScreen` continua pura: recebe `message` por prop do contêiner.
 
 ### 4.3 `DigitBoxes` (apresentação pura)
 - Props: `digits: string`, `total: number`.
@@ -70,7 +73,8 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
 - `<img onError>` esconde a imagem quebrada (fica só o texto). `alt=""` (o nome já está em texto).
 
 ### 4.5 `UrnaKeypad` (apresentação, controlada)
-- Props: `onDigit(d)`, `onBlank()`, `onCorrect()`, `onConfirm()`, `confirmEnabled: boolean`, `pressedKey?: string | null`, `disabled?: boolean`.
+- Props: `onDigit(d)`, `onBlank()`, `onCorrect()`, `onConfirm()`, `confirmEnabled: boolean`, `pressedKey?: KeyId | null`, `decorative?: boolean`, com `type KeyId = "0" | … | "9" | "BRANCO" | "CORRIGE" | "CONFIRMA"` exportado pelo componente e usado pelo contêiner ao traduzir o teclado físico.
+- `decorative=true` só é usado pelo `UrnaShell size="display"` (ver 4.1). Não há prop `disabled`: na view `finished` as teclas continuam clicáveis e o contêiner as ignora (ver 4.8).
 - Grid 3×4: 1-9, 0 centralizado na última linha; abaixo, BRANCO (branca, texto preto), CORRIGE (laranja `--key-corrige`), CONFIRMA (verde `--key-confirma`, maior).
 - Teclas numéricas: escuras com gradiente e "espessura" (box-shadow em Y); ao pressionar (`:active` ou `pressedKey === label`) translada 2 px e reduz a sombra. `pressedKey` permite acender a tecla quando o teclado físico é usado (≈ 120 ms).
 - CONFIRMA com `confirmEnabled=false` fica visualmente igual (urna real não desabilita a tecla); o clique chama `onConfirm`, que decide (beep de erro / mensagem). `aria-disabled` reflete o estado para leitores de tela.
@@ -81,7 +85,7 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
 - Substitui `ProgressBar`. Desktop: lista horizontal dos 6 cargos com o atual em destaque e os feitos marcados; celular: "Cargo {n} de {total}" + barra fina. Mantém `role="progressbar"` e `aria-current="step"`.
 
 ### 4.7 `SoundToggle`
-- Botão de mudo ao lado da urna. Persiste em `localStorage` (`legisurna:muted`), com try/catch. `aria-pressed`.
+- Botão de mudo ao lado da urna. Persiste em `localStorage` (`legisurna:muted`), com try/catch; o valor é lido em `useEffect` (não no primeiro render) para evitar divergência de hidratação no SSR. `aria-pressed`.
 - `src/lib/audio.ts` recebe: `setMuted(bool)`, `isMuted()`, e `sfx.fim()` (tom mais longo, ≈ 700 ms, dois estágios). `beep` retorna sem tocar quando mutado.
 
 ### 4.8 `UrnaVoting` (contêiner; único que fala com o store)
@@ -91,10 +95,13 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
   - `status === "FINISHED"` → `finished`
   - `BLANK_PENDING` → `blank`
   - `CANDIDATE_FOUND` → `candidate`
-  - `CONFIRM_READY` ou `INVALID_NUMBER` → `null`
+  - `CONFIRM_READY` → `null`
+  - `INVALID_NUMBER` → `invalid`
   - demais (`TYPING`, `READY`) → `typing`
 - Regras da tela de espera: enquanto `!started`, dígitos, BRANCO e CORRIGE são ignorados (beep curto de tecla ainda toca); CONFIRMA define `started = true` e toca `sfx.confirm`. Só então `track("simulation_started")` é disparado (hoje dispara no `mount`; passa a disparar no início real).
-- Ao `FINISHED`: toca `sfx.fim()`, `track("simulation_completed")`, exibe `finished` na tela e mostra abaixo da urna os botões **Votar novamente** (chama `restart()` e volta para `idle`) e **Sair** (link para `/`). Não navega para outra rota.
+- Eventos de analytics mantidos nos mesmos pontos de hoje: `office_completed` (`{ office, index }`) em cada CONFIRMA aceito, `correction_used` (`{ office }`) em CORRIGE, `blank_flow_used` (`{ office }`) em BRANCO. `simulation_completed` passa a disparar **uma vez só**, em `FINISHED`, com `{ state: stateCode, total_offices: offices.length }` (hoje dispara duas vezes, em `VotingScreen` e na página `fim`).
+- No último cargo, o CONFIRMA aceito toca **só** `sfx.fim()` (não toca `sfx.confirm` antes); nos demais cargos toca `sfx.confirm`.
+- Ao `FINISHED`: exibe `finished` na tela e mostra abaixo da urna os botões **Votar novamente** (chama `restart()`, zera `started`, volta para `idle`) e **Sair** (link para `/`). Não navega para outra rota. Nesse estado, dígitos, BRANCO, CORRIGE e CONFIRMA (virtuais ou físicos) são ignorados pelo contêiner sem som e sem chamar o store.
 - Teclado físico igual ao atual (0-9, Backspace/Esc, Enter, B), agora também acendendo `pressedKey`. Ignora eventos quando o foco está em um `input`/`textarea` (não há nenhum hoje; defesa barata).
 - `aria-live` (região `sr-only`) com as mesmas mensagens de hoje, mais "Urna pronta. Aperte Confirma para iniciar." e "Fim da votação.".
 
@@ -144,7 +151,7 @@ Componentes que ficam sem uso e são removidos: `VotingScreen.tsx`, `NumericKeyp
    - rotas: `/`, `/simular`, `/como-funciona`, `/privacidade`, `/termos` existem; `src/app/simular/[uf]/fim` **não** existe;
    - `src/components/urna/{UrnaShell,UrnaScreen,UrnaKeypad,CandidatePanel,DigitBoxes,ProgressStrip,SoundToggle,UrnaVoting}.tsx` existem;
    - `UrnaScreen.tsx` contém "NÚMERO ERRADO", "VOTO EM BRANCO", "FIM" e "SEU VOTO PARA";
-   - nenhum arquivo em `src/` contém "TSE" ou "Justiça Eleitoral" fora de `Disclaimer.tsx` e das páginas de texto (`como-funciona`, `privacidade`, `termos`), para garantir que a urna não usa a marca;
+   - nenhum arquivo em `src/components/urna/` contém "TSE", "Justiça Eleitoral" ou "brasão" (a urna não usa a marca; menções informativas em `layout.tsx`, `page.tsx`, dados e páginas de texto continuam permitidas);
    - privacidade: `analytics.ts` sem `candidate_id` fora de comentários (regra atual).
 3. Verificação visual local (`pnpm dev`): as seis telas (espera, digitando, candidato, nulo, branco, FIM) em 1280 px e em 390 px, com screenshots salvos em `docs/superpowers/specs/screenshots/` para o histórico.
 4. Deploy pelo procedimento registrado (build com `--memory=3g` na VPS BI, tag `legisurna:<sha>`, `docker run` com as labels do Traefik) e smoke em produção: rotas 200, `/simular/SP/fim` → 404, aviso presente, `noindex` em `/votar`.
@@ -155,3 +162,4 @@ Componentes que ficam sem uso e são removidos: `VotingScreen.tsx`, `NumericKeyp
 - Banco/admin (Fase 2), PWA offline (Fase 4), Sentry/PostHog (Fase 6).
 - Áudio idêntico ao da urna oficial (proibido pela spec original; sons continuam próprios).
 - Modo escuro para a urna em si.
+- `src/app/como-funciona/page.tsx` ainda descreve a ordem antiga de 4 cargos (sujeira pré-existente). Fica como está; avisar Domenico e corrigir só se ele pedir.
