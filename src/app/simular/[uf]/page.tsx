@@ -16,9 +16,9 @@ export default async function ConfirmState({ params }: PageProps<"/simular/[uf]"
       </p>
       <Link
         href={`/simular/${state.code}/votar`}
-        className="w-full rounded-lg bg-sky-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700"
+        className="urna-key urna-key--fn urna-key--confirma flex min-h-16 w-full items-center justify-center !text-lg"
       >
-        Iniciar votação
+        INICIAR VOTAÇÃO
       </Link>
       <Link href="/simular" className="text-sm underline">Trocar estado</Link>
     </main>
