@@ -34,6 +34,7 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
 - Renderiza o corpo físico: base bege (`--urna-body`) com gradiente e sombra, moldura escura da tela (`--urna-bezel`), painel preto do teclado (`--urna-panel`) com o rótulo **SIMULADOR** acima das teclas, aberturas de ventilação (fileira de ranhuras) na borda frontal.
 - Layout: em `≥ 768px` tela à esquerda (≈ 60 %) e painel do teclado à direita (≈ 40 %), lado a lado; em `< 768px` empilhado (tela em cima ocupando a largura toda, teclado embaixo).
 - `size="display"`: versão sem interação para a landing. Quando `keypad` é omitido, o próprio `UrnaShell` renderiza `UrnaKeypad` com handlers vazios e `decorative` (teclas com `aria-hidden`, `tabIndex=-1`, `pointer-events: none`). A página não precisa passar teclado.
+- `UrnaShell` é `"use client"` (cria os handlers vazios internamente); a landing, que é server component, passa só `screen` (ReactNode) e `size`.
 - Não conhece estado de votação.
 
 ### 4.2 `UrnaScreen` (apresentação pura)
@@ -85,7 +86,7 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
 - Substitui `ProgressBar`. Desktop: lista horizontal dos 6 cargos com o atual em destaque e os feitos marcados; celular: "Cargo {n} de {total}" + barra fina. Mantém `role="progressbar"` e `aria-current="step"`.
 
 ### 4.7 `SoundToggle`
-- Botão de mudo ao lado da urna. Persiste em `localStorage` (`legisurna:muted`), com try/catch; o valor é lido em `useEffect` (não no primeiro render) para evitar divergência de hidratação no SSR. `aria-pressed`.
+- Botão de mudo ao lado da urna. Persiste em `localStorage` (`legisurna:muted`), com try/catch; o valor é lido em `useEffect` (não no primeiro render) para evitar divergência de hidratação no SSR, e esse mesmo efeito chama `setMuted()` do módulo de áudio para o estado do botão e o do som nunca divergirem. `aria-pressed`.
 - `src/lib/audio.ts` recebe: `setMuted(bool)`, `isMuted()`, e `sfx.fim()` (tom mais longo, ≈ 700 ms, dois estágios). `beep` retorna sem tocar quando mutado.
 
 ### 4.8 `UrnaVoting` (contêiner; único que fala com o store)
@@ -98,15 +99,17 @@ Novo diretório `src/components/urna/`. Cada unidade tem uma responsabilidade e 
   - `CONFIRM_READY` → `null`
   - `INVALID_NUMBER` → `invalid`
   - demais (`TYPING`, `READY`) → `typing`
-- Regras da tela de espera: enquanto `!started`, dígitos, BRANCO e CORRIGE são ignorados (beep curto de tecla ainda toca); CONFIRMA define `started = true` e toca `sfx.confirm`. Só então `track("simulation_started")` é disparado (hoje dispara no `mount`; passa a disparar no início real).
+- Regras da tela de espera: enquanto `!started`, dígitos, BRANCO e CORRIGE são ignorados pelo contêiner (toca só `sfx.digit` para qualquer um deles, sem chamar o store); CONFIRMA define `started = true` e toca `sfx.confirm`. Só então `track("simulation_started", { state: stateCode, mode: "completo" })` é disparado (hoje dispara no `mount`; passa a disparar no início real, com o mesmo payload).
+- `confirmEnabled` passado ao teclado é `!started || isConfirmEnabled()`: na tela de espera a tecla verde é justamente a que inicia, então não pode aparecer como `aria-disabled`.
+- `ProgressStrip` é renderizado por `UrnaVoting` (que tem `started`, `currentIndex` e `status`), acima do `UrnaShell`. Em `idle` mostra cargo 1 de 6 sem nenhum concluído; em `finished` mostra todos concluídos.
 - Eventos de analytics mantidos nos mesmos pontos de hoje: `office_completed` (`{ office, index }`) em cada CONFIRMA aceito, `correction_used` (`{ office }`) em CORRIGE, `blank_flow_used` (`{ office }`) em BRANCO. `simulation_completed` passa a disparar **uma vez só**, em `FINISHED`, com `{ state: stateCode, total_offices: offices.length }` (hoje dispara duas vezes, em `VotingScreen` e na página `fim`).
-- No último cargo, o CONFIRMA aceito toca **só** `sfx.fim()` (não toca `sfx.confirm` antes); nos demais cargos toca `sfx.confirm`.
+- No último cargo, o CONFIRMA aceito toca **só** `sfx.fim()` (não toca `sfx.confirm` antes); nos demais cargos toca `sfx.confirm`. Detecção: após `confirm()` retornar `"ok"`, ler `useVotingSession.getState().status === "FINISHED"` (não comparar índices).
 - Ao `FINISHED`: exibe `finished` na tela e mostra abaixo da urna os botões **Votar novamente** (chama `restart()`, zera `started`, volta para `idle`) e **Sair** (link para `/`). Não navega para outra rota. Nesse estado, dígitos, BRANCO, CORRIGE e CONFIRMA (virtuais ou físicos) são ignorados pelo contêiner sem som e sem chamar o store.
-- Teclado físico igual ao atual (0-9, Backspace/Esc, Enter, B), agora também acendendo `pressedKey`. Ignora eventos quando o foco está em um `input`/`textarea` (não há nenhum hoje; defesa barata).
+- Teclado físico igual ao atual (0-9, Backspace/Esc, Enter, B), agora também acendendo `pressedKey`. O handler retorna cedo **sem** `preventDefault()` em três casos: view `finished` (para Enter/Espaço continuarem ativando os botões **Votar novamente**/**Sair** focados), foco em `input`/`textarea`/`button`/`a` (para não roubar o Enter nativo do elemento focado) e tecla não mapeada. Só chama `preventDefault()` quando de fato consome a tecla.
 - `aria-live` (região `sr-only`) com as mesmas mensagens de hoje, mais "Urna pronta. Aperte Confirma para iniciar." e "Fim da votação.".
 
 ### 4.9 `VotingMachine`
-- Mantido como ponto de entrada da rota; passa a renderizar `DisclaimerBanner` + `ProgressStrip` + `UrnaShell` com `UrnaScreen`/`UrnaKeypad` via `UrnaVoting`, e `SoundToggle`. `init()` continua no mount.
+- Mantido como ponto de entrada da rota; passa a renderizar `DisclaimerBanner` + `UrnaVoting` (que contém `ProgressStrip`, `UrnaShell`, `UrnaScreen`, `UrnaKeypad`) + `SoundToggle`. `init()` continua no mount.
 
 ### 4.10 Tokens de design (`globals.css`)
 ```css
@@ -151,7 +154,7 @@ Componentes que ficam sem uso e são removidos: `VotingScreen.tsx`, `NumericKeyp
    - rotas: `/`, `/simular`, `/como-funciona`, `/privacidade`, `/termos` existem; `src/app/simular/[uf]/fim` **não** existe;
    - `src/components/urna/{UrnaShell,UrnaScreen,UrnaKeypad,CandidatePanel,DigitBoxes,ProgressStrip,SoundToggle,UrnaVoting}.tsx` existem;
    - `UrnaScreen.tsx` contém "NÚMERO ERRADO", "VOTO EM BRANCO", "FIM" e "SEU VOTO PARA";
-   - nenhum arquivo em `src/components/urna/` contém "TSE", "Justiça Eleitoral" ou "brasão" (a urna não usa a marca; menções informativas em `layout.tsx`, `page.tsx`, dados e páginas de texto continuam permitidas);
+   - nenhum arquivo em `src/components/urna/` contém "TSE", "Justiça Eleitoral" ou "brasão" (`grep -rw`, sensível a maiúsculas; a urna não usa a marca; menções informativas em `layout.tsx`, `page.tsx`, dados e páginas de texto continuam permitidas);
    - privacidade: `analytics.ts` sem `candidate_id` fora de comentários (regra atual).
 3. Verificação visual local (`pnpm dev`): as seis telas (espera, digitando, candidato, nulo, branco, FIM) em 1280 px e em 390 px, com screenshots salvos em `docs/superpowers/specs/screenshots/` para o histórico.
 4. Deploy pelo procedimento registrado (build com `--memory=3g` na VPS BI, tag `legisurna:<sha>`, `docker run` com as labels do Traefik) e smoke em produção: rotas 200, `/simular/SP/fim` → 404, aviso presente, `noindex` em `/votar`.
