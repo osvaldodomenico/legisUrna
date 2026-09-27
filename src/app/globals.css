@@ -1,9 +1,37 @@
 @import "tailwindcss";
+@import "../styles/urna.css";
 
 :root {
   color-scheme: light dark;
+
+  /* Urna (objeto físico — não muda com o tema) */
+  --urna-body: #e8e4d8;
+  --urna-body-dark: #cfcabb;
+  --urna-bezel: #1f2327;
+  --urna-screen: #f4f4ef;
+  --urna-ink: #111111;
+  --urna-panel: #24282c;
+  --key-dark: #2f343a;
+  --key-dark-edge: #0b0d0f;
+  --key-branco: #ffffff;
+  --key-corrige: #f0731f;
+  --key-confirma: #1f9d55;
+
+  /* Palco (fundo da página — único token que segue o tema) */
+  --stage: #eef0f2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --stage: #0f172a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --stage: #0f172a;
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background: var(--stage);
 }

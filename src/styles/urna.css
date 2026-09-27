@@ -1,0 +1,221 @@
+/* Aparência física da urna. Toda a "realidade" (volume, relevo, ranhuras) fica aqui;
+   os componentes TSX só aplicam classes. Sem imagens. */
+
+.urna {
+  --urna-radius: 18px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 16px 34px;
+  border-radius: var(--urna-radius) var(--urna-radius) 12px 12px;
+  background:
+    linear-gradient(168deg, #f5f3ec 0%, var(--urna-body) 45%, var(--urna-body-dark) 100%);
+  box-shadow:
+    0 28px 44px -18px rgba(0, 0, 0, 0.5),
+    0 2px 0 rgba(255, 255, 255, 0.7) inset,
+    0 -8px 16px rgba(0, 0, 0, 0.08) inset;
+  color-scheme: light;
+}
+
+@media (min-width: 768px) {
+  .urna {
+    grid-template-columns: 3fr 2fr;
+    gap: 24px;
+    padding: 28px 28px 40px;
+  }
+}
+
+/* Modo exibição (landing): menor e sem interação */
+.urna--display {
+  max-width: 640px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Ranhuras de ventilação na borda frontal */
+.urna__vents {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.urna__vents i {
+  width: 4px;
+  height: 12px;
+  border-radius: 2px;
+  background: #3a3a3a;
+  opacity: 0.7;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Tela: moldura escura + vidro claro, sempre 4:3 */
+.urna__bezel {
+  padding: 10px;
+  border-radius: 8px;
+  background: linear-gradient(#2a2f34, var(--urna-bezel));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5),
+    0 6px 14px rgba(0, 0, 0, 0.25) inset;
+}
+.urna__screen {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--urna-screen);
+  color: var(--urna-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 0 0 1px #000 inset;
+  container-type: inline-size;
+}
+.urna__screen-inner {
+  position: absolute;
+  inset: 0;
+  /* Tipografia escala com a largura da TELA (cqw resolve contra o ancestral .urna__screen) */
+  font-size: clamp(11px, 2.6cqw, 18px);
+  display: flex;
+  flex-direction: column;
+  padding: 5.5% 5% 0;
+  animation: urna-fade 150ms ease-out;
+}
+@keyframes urna-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.urna__title { font-weight: 700; font-size: 0.85em; }
+.urna__office { font-weight: 700; font-size: 1.5em; text-align: center; margin: 0.5em 0 0.9em; }
+.urna__line { line-height: 1.75; }
+.urna__center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.6em;
+  line-height: 1.4;
+  padding-bottom: 20%;
+}
+.urna__fim {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 5em;
+  letter-spacing: 0.12em;
+  padding-bottom: 12%;
+}
+
+/* Barra de instruções, colada na base da tela */
+.urna__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.6em 5%;
+  border-top: 1.5px solid var(--urna-ink);
+  background: var(--urna-screen);
+  font-size: 0.85em;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+.urna__bar--alert { font-weight: 700; }
+.urna__bar--muted { border-top: 0; text-align: center; color: #555; font-size: 0.75em; }
+
+/* Número em caixas */
+.urna__digits { display: flex; align-items: center; gap: 0.3em; margin-bottom: 0.7em; }
+.urna__box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55em;
+  height: 2.1em;
+  border: 1.5px solid var(--urna-ink);
+  background: #fff;
+  font-size: 1.35em;
+  font-weight: 700;
+}
+.urna__box--cursor { border-width: 2.5px; }
+
+/* Painel do candidato: texto à esquerda, fotos à direita */
+.urna__candidate { display: grid; grid-template-columns: 1fr auto; gap: 0.8em; align-items: start; }
+.urna__photos { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4em; }
+.urna__photo {
+  display: block;
+  object-fit: cover;
+  border: 1px solid #555;
+  background: #c9ced4;
+}
+.urna__photo--main { width: 6.4em; height: 8.2em; }
+.urna__photo--mate { width: 3.6em; height: 4.6em; }
+.urna__photo-cap { font-size: 0.65em; text-align: center; margin-top: 0.15em; }
+
+/* Painel do teclado */
+.urna__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 14px 18px;
+  border-radius: 10px;
+  background: linear-gradient(#2c3035, var(--urna-panel));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6) inset, 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.urna__panel-label {
+  color: #d7dbdf;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+.urna__keys { display: grid; grid-template-columns: repeat(3, minmax(48px, 1fr)); gap: 10px; width: 100%; max-width: 260px; }
+.urna__fn { display: grid; grid-template-columns: 1fr 1fr 1.35fr; gap: 8px; width: 100%; max-width: 260px; align-items: end; }
+
+/* Tecla física: relevo com "espessura" no eixo Y */
+.urna-key {
+  --edge: var(--key-dark-edge);
+  --face: var(--key-dark);
+  --ink: #fff;
+  position: relative;
+  min-width: 48px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(color-mix(in srgb, var(--face) 78%, white), var(--face));
+  color: var(--ink);
+  font: 700 1.25rem/1 Arial, Helvetica, sans-serif;
+  box-shadow: 0 4px 0 var(--edge), 0 6px 10px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  cursor: pointer;
+  transition: transform 60ms ease-out, box-shadow 60ms ease-out;
+  touch-action: manipulation;
+}
+.urna-key:active,
+.urna-key--pressed {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--edge), 0 2px 4px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.18) inset;
+}
+.urna-key:focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
+.urna-key--zero { grid-column: 2; }
+.urna-key--fn { font-size: 0.7rem; letter-spacing: 0.04em; min-height: 52px; }
+.urna-key--branco { --face: var(--key-branco); --edge: #8f9398; --ink: #111; }
+.urna-key--corrige { --face: var(--key-corrige); --edge: #9a3a06; --ink: #111; }
+.urna-key--confirma { --face: var(--key-confirma); --edge: #0b4d24; --ink: #111; min-height: 64px; }
+.urna-key[aria-disabled="true"] { opacity: 0.92; }
+
+/* CTAs fora da urna (landing, Votar novamente/Sair) reutilizam .urna-key .urna-key--confirma / --branco; não criar classe nova. */
+
+@media (prefers-reduced-motion: reduce) {
+  .urna__screen-inner { animation: none; }
+  .urna-key { transition: none; }
+  .urna-key:active, .urna-key--pressed { transform: none; }
+}
