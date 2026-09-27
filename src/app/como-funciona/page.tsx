@@ -8,7 +8,7 @@ export default function ComoFunciona() {
       <DisclaimerBanner className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-center text-xs font-semibold text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200" />
       <h1 className="text-2xl font-bold">Como funciona</h1>
       <ol className="list-inside list-decimal space-y-2 text-sm leading-6 text-slate-700 dark:text-slate-300">
-        <li>Escolha o estado em que você vota.</li>
+        <li>A simulação usa as candidaturas de São Paulo.</li>
         <li>Digite o número do candidato no teclado — a candidatura só aparece quando o número estiver completo.</li>
         <li>Confira foto, nome de urna e partido. Use <strong>Corrige</strong> para apagar e <strong>Branco</strong> para voto em branco.</li>
         <li>Pressione <strong>Confirma</strong> para avançar ao próximo cargo.</li>

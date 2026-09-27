@@ -29,6 +29,8 @@ done
 for t in "SEU VOTO PARA" "NÚMERO ERRADO" "VOTO EM BRANCO" "FIM"; do
   if grep -q "$t" src/components/urna/UrnaScreen.tsx; then pass "tela contém '$t'"; else fail "tela sem '$t'"; fi
 done
+if [ -e "src/app/simular/[uf]" ]; then fail "rota /simular/[uf] ainda existe (só São Paulo)"; else pass "escolha de estado removida (só São Paulo)"; fi
+if grep -q "etapas oficiais" src/components/voting/VotingMachine.tsx; then pass "orientações acima da urna"; else fail "orientações acima da urna ausentes"; fi
 if [ -e "src/app/simular/[uf]/fim" ]; then fail "rota /simular/[uf]/fim ainda existe"; else pass "rota /fim removida (FIM dentro da urna)"; fi
 if [ -d src/components/urna ] && ! grep -rwiq "TSE\|Justiça Eleitoral\|brasão" src/components/urna; then pass "urna sem marca da Justiça Eleitoral"; else fail "componentes da urna ausentes ou mencionam TSE/Justiça Eleitoral/brasão"; fi
 
