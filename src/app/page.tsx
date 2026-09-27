@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DisclaimerBanner } from "@/components/ui/Disclaimer";
+import { STATES } from "@/data/states";
 import { UrnaShell } from "@/components/urna/UrnaShell";
 import { UrnaScreen } from "@/components/urna/UrnaScreen";
 
@@ -7,8 +8,6 @@ export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center gap-8 px-4 py-10 text-center">
       <DisclaimerBanner className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200" />
-
-      <UrnaShell size="display" screen={<UrnaScreen view={{ kind: "idle", stateName: null }} />} />
 
       <div className="flex flex-col items-center gap-4">
         <h1 className="text-3xl font-bold sm:text-4xl">Simulador de Votação 2026</h1>
@@ -32,6 +31,8 @@ export default function Home() {
         <li>5. Governador (2 dígitos)</li>
         <li>6. Presidente (2 dígitos)</li>
       </ol>
+      <UrnaShell size="display" screen={<UrnaScreen view={{ kind: "idle", stateName: STATES[0].name }} />} />
+
       <p className="text-xs text-slate-600 dark:text-slate-400">
         Sua escolha não é enviada a nenhum servidor. Nenhuma informação pessoal é registrada.
       </p>
