@@ -4,7 +4,7 @@ import { CandidatePanel } from "./CandidatePanel";
 
 const BAR_CONFIRM = "Aperte a tecla:\n  VERDE para CONFIRMAR este voto\n  LARANJA para REINICIAR este voto";
 const BAR_TYPING = "Digite o número do candidato.\nPara votar em branco, aperte a tecla BRANCO.";
-const BAR_IDLE = "Aperte a tecla VERDE para iniciar a simulação.";
+const BAR_IDLE = "Aperte a tecla VERDE (CONFIRMA) para começar.";
 const BAR_INVALID = "Aperte a tecla LARANJA para corrigir.";
 
 function Bar({ text, alert = false }: { text: string; alert?: boolean }) {
@@ -28,6 +28,9 @@ export function UrnaScreen({ view, message }: { view: ScreenView; message?: stri
                 2026
                 <div className="urna__idle-sub">
                   {view.stateName ? <>Estado: <b>{view.stateName}</b></> : "Escolha seu estado"}
+                </div>
+                <div className="urna__idle-cta">
+                  PRESSIONE <span className="urna__idle-key">CONFIRMA</span> PARA COMEÇAR
                 </div>
               </div>
               <Bar text={BAR_IDLE} />

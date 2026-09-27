@@ -113,6 +113,14 @@
   line-height: 1.4;
 }
 .urna__idle-sub { font-size: 0.6em; font-weight: 400; margin-top: 1em; }
+.urna__idle-cta { font-size: 0.6em; font-weight: 700; margin-top: 1.4em; letter-spacing: 0.04em; }
+.urna__idle-key {
+  display: inline-block;
+  padding: 0.1em 0.5em;
+  border-radius: 0.25em;
+  background: var(--key-confirma);
+  color: #fff;
+}
 .urna__fim {
   flex: 1;
   display: flex;
