@@ -1543,7 +1543,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 Procedimento registrado na memória `legisurna-deploy` e no Obsidian. VPS BI = `ssh vps2`.
 
-- [ ] **Step 1: Push (HTTPS via gh — a chave SSH é deploy key só de leitura) e conferir**
+- [x] **Step 1: Push (HTTPS via gh — a chave SSH é deploy key só de leitura) e conferir**
 
 ```bash
 git -c credential.helper='!gh auth git-credential' push https://github.com/osvaldodomenico/legisUrna.git main
@@ -1551,7 +1551,7 @@ git fetch -q origin && git status -sb | head -1
 ```
 Expected: `## main...origin/main` (sem `ahead`).
 
-- [ ] **Step 2: Build na VPS BI com limite de memória**
+- [x] **Step 2: Build na VPS BI com limite de memória**
 
 ```bash
 SHA=$(git rev-parse --short HEAD)
@@ -1559,7 +1559,7 @@ ssh vps2 "cd /opt/legisurna && git fetch -q origin && git reset -q --hard origin
 ```
 Expected: `Successfully tagged legisurna:<sha>`; RAM usada ≈ 5 GB.
 
-- [ ] **Step 3: Registrar a tag em produção (rollback) e trocar o container (mesmas labels do Traefik)**
+- [x] **Step 3: Registrar a tag em produção (rollback) e trocar o container (mesmas labels do Traefik)**
 
 ```bash
 ssh vps2 "docker inspect legisurna --format '{{.Config.Image}}'; docker images legisurna --format '{{.Repository}}:{{.Tag}}'"
@@ -1584,7 +1584,7 @@ ssh vps2 "docker rm -f legisurna && docker run -d --name legisurna --restart unl
 ```
 Expected: `Up 5 seconds`.
 
-- [ ] **Step 4: Smoke em produção**
+- [x] **Step 4: Smoke em produção**
 
 ```bash
 for p in / /simular /simular/SP /simular/SP/votar /como-funciona /privacidade /termos /simular/SP/fim; do
@@ -1607,14 +1607,14 @@ Rollback, se algo falhar: mesmo `docker run` do Step 3 com a **tag anotada no in
 - Modify: `…/shiftworks_brain/01 - Projetos Ativos/LegisUrna/03 - Backlog.md`
 - Modify: `~/.claude/projects/-Users-domenico-Downloads-sistemas-LegisUrna/memory/legisurna-deploy.md` (e cópia em `~/.claude-lobo/...`)
 
-- [ ] **Step 1: Histórico** — acrescentar entrada "2026-09-26 — Interface urna realista (réplica visual)" com: direção A escolhida via visual companion; componentes em `src/components/urna/`; FIM dentro da urna e rota `/fim` removida; tela de espera; som do FIM + mudo; `simulation_started` no primeiro CONFIRMA; testes 23 → N (usar o total que `pnpm test` imprimir); tag de deploy `legisurna:<sha>`; smoke OK.
+- [x] **Step 1: Histórico** — acrescentar entrada "2026-09-26 — Interface urna realista (réplica visual)" com: direção A escolhida via visual companion; componentes em `src/components/urna/`; FIM dentro da urna e rota `/fim` removida; tela de espera; som do FIM + mudo; `simulation_started` no primeiro CONFIRMA; testes 23 → N (usar o total que `pnpm test` imprimir); tag de deploy `legisurna:<sha>`; smoke OK.
 
-- [ ] **Step 2: Arquitetura** — na seção "Engine de votação", trocar `components/voting/ — VotingMachine, VotingScreen, NumericKeypad, CandidateCard, ProgressBar` por `components/voting/VotingMachine` + `components/urna/{UrnaShell,UrnaScreen,DigitBoxes,CandidatePanel,UrnaKeypad,ProgressStrip,SoundToggle,UrnaVoting,screen-view}` e em "Rotas" remover `/simular/[uf]/fim`.
+- [x] **Step 2: Arquitetura** — na seção "Engine de votação", trocar `components/voting/ — VotingMachine, VotingScreen, NumericKeypad, CandidateCard, ProgressBar` por `components/voting/VotingMachine` + `components/urna/{UrnaShell,UrnaScreen,DigitBoxes,CandidatePanel,UrnaKeypad,ProgressStrip,SoundToggle,UrnaVoting,screen-view}` e em "Rotas" remover `/simular/[uf]/fim`.
 
-- [ ] **Step 3: Backlog** — adicionar em Fase 1 (ou nova linha "Fase 1b — UI urna realista ✅ 2026-09-26") e um item pendente: "Fotos de vice/suplentes + candidatos de exemplo (Domenico envia)".
+- [x] **Step 3: Backlog** — adicionar em Fase 1 (ou nova linha "Fase 1b — UI urna realista ✅ 2026-09-26") e um item pendente: "Fotos de vice/suplentes + candidatos de exemplo (Domenico envia)".
 
-- [ ] **Step 4: Memória** — em `legisurna-deploy.md`, atualizar a tag em produção e acrescentar `[[legisurna-ui-urna]]`; criar `legisurna-ui-urna.md` (type: project) com: direção A realista escolhida em 2026-09-26; toda a aparência em `src/styles/urna.css`; a única ponte com o store é `UrnaVoting`; `toScreenView` é pura e testada; não usar brasão/TSE dentro de `components/urna` (checkup falha). Atualizar `MEMORY.md` e copiar para `~/.claude-lobo/.../memory/`.
+- [x] **Step 4: Memória** — em `legisurna-deploy.md`, atualizar a tag em produção e acrescentar `[[legisurna-ui-urna]]`; criar `legisurna-ui-urna.md` (type: project) com: direção A realista escolhida em 2026-09-26; toda a aparência em `src/styles/urna.css`; a única ponte com o store é `UrnaVoting`; `toScreenView` é pura e testada; não usar brasão/TSE dentro de `components/urna` (checkup falha). Atualizar `MEMORY.md` e copiar para `~/.claude-lobo/.../memory/`.
 
-- [ ] **Step 5: Encerrar o visual companion**
+- [x] **Step 5: Encerrar o visual companion**
 
 Run: `/Users/domenico/.claude/plugins/cache/superpowers-marketplace/superpowers/5.0.2/skills/brainstorming/scripts/stop-server.sh /Users/domenico/Downloads/sistemas/LegisUrna/.superpowers/brainstorm/98701-1790472651`
