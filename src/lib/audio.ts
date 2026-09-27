@@ -19,14 +19,16 @@ export function subscribeMuted(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
-function tone(freq: number, ms: number, startOffsetMs = 0): void {
+function tone(freq: number, ms: number, startOffsetMs = 0, type: OscillatorType = "sine", volume = 0.08): void {
   if (typeof window === "undefined" || muted) return;
   try {
     ctx ??= new AudioContext();
+    if (ctx.state === "suspended") void ctx.resume(); // iOS/Safari começam suspensos até um gesto
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    osc.type = type;
     osc.frequency.value = freq;
-    gain.gain.value = 0.08;
+    gain.gain.value = volume;
     osc.connect(gain).connect(ctx.destination);
     const start = ctx.currentTime + startOffsetMs / 1000;
     osc.start(start);
@@ -42,9 +44,19 @@ export const sfx = {
   correct: () => tone(330, 100),
   confirm: () => tone(660, 160),
   error: () => tone(220, 200),
-  // Tom do FIM: dois estágios, ~700 ms no total.
+  // Jingle do FIM: arpejo ascendente em onda quadrada (timbre de buzzer), nota final sustentada. ~1,3 s.
   fim: () => {
-    tone(523, 300);
-    tone(784, 400, 300);
+    const notes: Array<[freq: number, ms: number]> = [
+      [1047, 140], // C6
+      [1319, 140], // E6
+      [1568, 140], // G6
+      [2093, 140], // C7
+      [2637, 700], // E7 (sustentada)
+    ];
+    let at = 0;
+    for (const [freq, ms] of notes) {
+      tone(freq, ms, at, "square", 0.05);
+      at += ms + 20;
+    }
   },
 };
