@@ -1529,7 +1529,7 @@ Roteiro a enviar para Domenico, uma linha por tela. Pedir que salve um screensho
 - [ ] **Step 5: Parar o dev server e commitar os screenshots**
 
 ```bash
-pgrep -fl "next dev --port 3100"; pkill -f "next dev --port 3100"
+pgrep -fl "next dev --port 3100"; pkill -f "next dev --port 3100"; sleep 1; pgrep -fl next || echo "dev server parado"
 echo "docs" >> .dockerignore   # screenshots não entram no contexto de build
 git add .dockerignore docs/superpowers/specs/screenshots
 git commit -m "docs: screenshots da urna realista (landing e tela de espera, 1280/390)
@@ -1567,6 +1567,7 @@ ssh vps2 "docker inspect legisurna --format '{{.Config.Image}}'; docker images l
 Expected: a imagem atual (ex.: `legisurna:4f127ce`) aparece nas duas listas. **Anotar essa tag: é a de rollback.** Se não aparecer em `docker images`, parar e avisar.
 
 ```bash
+SHA=$(git rev-parse --short HEAD)   # cada chamada de shell é nova: redefinir aqui
 ssh vps2 "docker rm -f legisurna && docker run -d --name legisurna --restart unless-stopped --memory 512m --network easypanel \
  -l traefik.enable=true -l traefik.docker.network=easypanel \
  -l 'traefik.http.routers.legisurna-http.entrypoints=http' \
@@ -1594,7 +1595,7 @@ for p in / /simular /simular/SP /simular/SP/votar /como-funciona /privacidade /t
 ```
 Expected: todas 200 exceto `/simular/SP/fim` → 404; contagem do aviso ≥ 1; `noindex, nofollow`; `urna__panel-label` ≥ 1 (a urna renderizou na landing).
 
-Rollback, se algo falhar: mesmo `docker run` do Step 3 com a **tag anotada no início do Step 3** no lugar de `legisurna:$SHA`.
+Rollback, se algo falhar: mesmo `docker run` do Step 3 com a **tag anotada no início do Step 3** escrita literalmente no lugar de `legisurna:$SHA` (não depender de variável).
 
 ---
 
