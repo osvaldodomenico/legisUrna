@@ -1,8 +1,5 @@
 import Link from "next/link";
 import { DisclaimerBanner } from "@/components/ui/Disclaimer";
-import { STATES } from "@/data/states";
-import { UrnaShell } from "@/components/urna/UrnaShell";
-import { UrnaScreen } from "@/components/urna/UrnaScreen";
 
 export default function Home() {
   return (
@@ -15,12 +12,6 @@ export default function Home() {
           Treine o fluxo de votação das Eleições Gerais de 2026 numa réplica da urna: digite o número, veja a
           candidatura, confirme. Ordem oficial de votação, do TSE.
         </p>
-        <Link
-          href="/simular"
-          className="urna-key urna-key--fn urna-key--confirma flex min-h-16 w-full max-w-xs items-center justify-center !text-lg"
-        >
-          COMEÇAR SIMULAÇÃO
-        </Link>
       </div>
 
       <ol className="grid gap-2 text-left text-sm text-slate-700 dark:text-slate-300 sm:grid-cols-2">
@@ -31,11 +22,13 @@ export default function Home() {
         <li>5. Governador (2 dígitos)</li>
         <li>6. Presidente (2 dígitos)</li>
       </ol>
-      <UrnaShell size="display" screen={<UrnaScreen view={{ kind: "idle", stateName: STATES[0].name }} />} />
 
-      <p className="text-xs text-slate-600 dark:text-slate-400">
-        Sua escolha não é enviada a nenhum servidor. Nenhuma informação pessoal é registrada.
-      </p>
+      <Link
+        href="/simular"
+        className="urna-key urna-key--fn urna-key--confirma flex min-h-16 w-full max-w-xs items-center justify-center !text-lg"
+      >
+        COMEÇAR SIMULAÇÃO
+      </Link>
     </main>
   );
 }
