@@ -41,5 +41,13 @@ if grep -q "MAJORITARIAN_OFFICES" src/domain/voting/rules.ts && grep -q "isSecon
 echo "-- privacidade --"
 if grep -v "^[[:space:]]*//" src/lib/analytics.ts | grep -q "candidate_id"; then fail "analytics vaza candidate_id"; else pass "analytics sem PII eleitoral"; fi
 
+# -- divulga (client TSE, Fase 3) --
+[ -f src/lib/divulgacand/client.ts ] && pass "client divulgacand/client.ts" || fail "client divulgacand/client.ts ausente"
+[ -f src/lib/divulgacand/types.ts ] && pass "client divulgacand/types.ts" || fail "client divulgacand/types.ts ausente"
+[ -f tests/divulgacand-client.test.ts ] && pass "testes do client divulgacand" || fail "testes do client divulgacand ausentes"
+if grep -q "divulgacandcontas.tse.jus.br" src/lib/divulgacand/client.ts; then pass "host do DivulgaCand correto"; else fail "host do DivulgaCand incorreto"; fi
+if grep -q "MIN_INTERVAL_MS = 1000" src/lib/divulgacand/client.ts; then pass "intervalo mínimo entre consultas (1 s)"; else fail "intervalo entre consultas não definido"; fi
+if grep -rEq "^[[:space:]]*(cpf|tituloEleitor|dataDeNascimento)[?]?:" src/lib/divulgacand/types.ts; then fail "tipos do TSE declaram PII (cpf/titulo/dataDeNascimento)"; else pass "tipos do TSE sem PII declarada"; fi
+if grep -rqE "\b(cpf|tituloEleitor)\b" src/lib/divulgacand/client.ts; then fail "client referencia PII do TSE"; else pass "client não referencia PII do TSE"; fi
 if [ "$FAIL" -eq 0 ]; then echo "== 0 FAIL — pronto para validar com cliente =="; else echo "== $FAIL FAIL =="; fi
 exit $FAIL
