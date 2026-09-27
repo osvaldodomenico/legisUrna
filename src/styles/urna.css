@@ -162,19 +162,22 @@
 .urna__box--cursor { border-width: 2.5px; }
 
 /* Painel do candidato: caixas do número + linhas à esquerda, fotos à direita ocupando
-   a altura das duas partes. Fotos em cqw (a tela é 4:3, logo a altura também fica proporcional). */
-.urna__candidate { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.8em; align-items: start; }
+   a altura das duas partes. Fotos em cqw (a tela é 4:3, logo a altura também fica proporcional).
+   Como na urna real: titular grande (3:4) com o cargo na legenda; vice/suplentes menores
+   à esquerda dele, alinhados pela base. Slot sem foto fica como moldura vazia. */
+.urna__candidate { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6em; align-items: start; }
 .urna__candidate > :first-child { min-width: 0; }
-.urna__photos { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3em; }
-.urna__mates { display: flex; gap: 0.3em; }
+.urna__photos { display: flex; flex-direction: row; align-items: flex-end; justify-content: flex-end; gap: 0.5em; }
+.urna__mates { display: flex; gap: 0.4em; }
 .urna__photo {
   display: block;
   object-fit: cover;
+  object-position: top;
   border: 1px solid #555;
   background: #c9ced4;
 }
-.urna__photo--main { width: 16cqw; height: 20.5cqw; }
-.urna__photo--mate { width: 9cqw; height: 11.5cqw; }
+.urna__photo--main { width: 23cqw; height: 30.5cqw; }
+.urna__photo--mate { width: 10cqw; height: 13cqw; }
 .urna__photo-cap { font-size: 0.65em; line-height: 1.2; text-align: center; margin-top: 0.15em; }
 
 /* Tela muito estreita (viewport < ~372px): fonte já está no piso de 12px, então
@@ -182,6 +185,13 @@
 @container (max-width: 300px) {
   .urna__line { line-height: 1.15; }
   .urna__office { margin: 0.1em 0 0.2em; }
+}
+
+/* Tela larga (desktop): a fonte já está no teto de 18px, então sobra largura para as fotos
+   crescerem até a proporção da urna real sem espremer as caixas do número (senador: 3 caixas + 2 slots). */
+@container (min-width: 560px) {
+  .urna__photo--main { width: 28cqw; height: 37cqw; }
+  .urna__photo--mate { width: 12cqw; height: 16cqw; }
 }
 
 /* Painel do teclado */
