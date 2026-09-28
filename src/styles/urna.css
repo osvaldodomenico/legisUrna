@@ -143,8 +143,6 @@
   white-space: pre-wrap;
 }
 .urna__bar--alert { font-weight: 700; }
-.urna__bar--muted { border-top: 0; text-align: center; color: #555; font-size: 0.75em; }
-
 /* Número em caixas */
 .urna__digits { display: flex; align-items: center; gap: 0.3em; margin-bottom: 0.25em; }
 .urna__box {

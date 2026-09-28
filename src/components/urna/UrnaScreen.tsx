@@ -91,12 +91,7 @@ export function UrnaScreen({ view, message }: { view: ScreenView; message?: stri
           )}
 
           {view.kind === "finished" && (
-            <>
-              <div className="urna__fim">FIM</div>
-              <div className="urna__bar urna__bar--muted">
-                Simulação encerrada. Nenhum voto foi gravado ou enviado.
-              </div>
-            </>
+            <div className="urna__fim">FIM</div>
           )}
         </div>
       </div>
