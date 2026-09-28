@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { CONSENTIMENTO_TEXTO } from "@/lib/apuracao/consentimento";
+import { mascaraWhatsapp } from "@/lib/apuracao/mascara";
 
 type Etapa = "pergunta" | "form" | "enviado" | "fechado";
 const CHAVE = "legisurna:contato-respondido";
@@ -83,7 +84,8 @@ export function ContatoCard() {
       </label>
       <label className="font-semibold">
         WhatsApp com DDD
-        <input name="whatsapp" required type="tel" inputMode="tel" autoComplete="tel-national" placeholder="(11) 91234-5678" maxLength={20} className={campo} />
+        <input name="whatsapp" required type="tel" inputMode="tel" autoComplete="tel-national" placeholder="(11) 91234-5678" maxLength={15} className={campo}
+          onChange={(e) => { e.currentTarget.value = mascaraWhatsapp(e.currentTarget.value); }} />
       </label>
       <label className="flex items-start gap-2 text-xs leading-5 text-slate-700 dark:text-slate-300">
         <input name="consentimento" type="checkbox" required className="mt-1" />

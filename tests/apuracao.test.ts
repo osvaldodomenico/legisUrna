@@ -85,3 +85,15 @@ describe("apuração", () => {
     expect(csv).toContain('"a;b"');
   });
 });
+
+import { mascaraWhatsapp } from "@/lib/apuracao/mascara";
+describe("máscara do WhatsApp", () => {
+  it("formata celular, fixo e digitação parcial", () => {
+    expect(mascaraWhatsapp("12982771555")).toBe("(12) 98277-1555");
+    expect(mascaraWhatsapp("1234567890")).toBe("(12) 3456-7890");
+    expect(mascaraWhatsapp("1")).toBe("(1");
+    expect(mascaraWhatsapp("129")).toBe("(12) 9");
+    expect(mascaraWhatsapp("(12) 98277-15559999")).toBe("(12) 98277-1555");
+    expect(mascaraWhatsapp("")).toBe("");
+  });
+});
