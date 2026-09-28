@@ -6,7 +6,7 @@ import { useVotingSession } from "@/stores/voting-session";
 import { currentOffice } from "@/domain/voting/rules";
 import { STATES } from "@/data/states";
 import { track } from "@/lib/analytics";
-import { sfx } from "@/lib/audio";
+import { FIM_MS, sfx } from "@/lib/audio";
 import { enviarSimulacao } from "@/lib/apuracao/enviar";
 import { ContatoCard } from "@/components/contato/ContatoCard";
 import { toScreenView } from "./screen-view";
@@ -31,6 +31,9 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   const [pressedKey, setPressedKey] = useState<KeyId | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restartButtonRef = useRef<HTMLButtonElement | null>(null);
+  // Convite de contato abre em modal só quando o jingle do FIM termina.
+  const [convite, setConvite] = useState(false);
+  const conviteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const office = currentOffice(offices, currentIndex);
   const stateName = STATES.find((s) => s.code === stateCode)?.name ?? null;
@@ -42,7 +45,10 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
     if (flashTimer.current) clearTimeout(flashTimer.current);
     flashTimer.current = setTimeout(() => setPressedKey(null), FLASH_MS);
   }, []);
-  useEffect(() => () => { if (flashTimer.current) clearTimeout(flashTimer.current); }, []);
+  useEffect(() => () => {
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    if (conviteTimer.current) clearTimeout(conviteTimer.current);
+  }, []);
   useEffect(() => { if (finished) restartButtonRef.current?.focus(); }, [finished]);
 
   // --- ações (compartilhadas entre teclado virtual e físico) ---
@@ -82,6 +88,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
     const nowFinished = useVotingSession.getState().status === "FINISHED";
     if (nowFinished) {
       sfx.fim();
+      conviteTimer.current = setTimeout(() => setConvite(true), FIM_MS);
       track("simulation_completed", { state: stateCode, total_offices: offices.length });
       enviarSimulacao(stateCode, useVotingSession.getState().votes);
     } else {
@@ -93,6 +100,8 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   const onRestart = useCallback(() => {
     restart();
     setStarted(false);
+    if (conviteTimer.current) clearTimeout(conviteTimer.current);
+    setConvite(false);
   }, [restart]);
 
   // --- teclado físico ---
@@ -143,7 +152,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
         }
       />
 
-      {finished && <ContatoCard />}
+      {finished && convite && <ContatoCard />}
 
       {finished && (
         <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">

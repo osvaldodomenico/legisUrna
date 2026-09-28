@@ -38,6 +38,17 @@ function tone(freq: number, ms: number, startOffsetMs = 0, type: OscillatorType 
   }
 }
 
+const FIM_NOTES: Array<[freq: number, ms: number]> = [
+  [1047, 140], // C6
+  [1319, 140], // E6
+  [1568, 140], // G6
+  [2093, 140], // C7
+  [2637, 700], // E7 (sustentada)
+];
+const FIM_GAP_MS = 20;
+/** Duração total do jingle do FIM (para abrir o convite só depois do som). */
+export const FIM_MS = FIM_NOTES.reduce((t, [, ms]) => t + ms + FIM_GAP_MS, 0);
+
 export const sfx = {
   digit: () => tone(880, 60),
   blank: () => tone(440, 120),
@@ -46,17 +57,10 @@ export const sfx = {
   error: () => tone(220, 200),
   // Jingle do FIM: arpejo ascendente em onda quadrada (timbre de buzzer), nota final sustentada. ~1,3 s.
   fim: () => {
-    const notes: Array<[freq: number, ms: number]> = [
-      [1047, 140], // C6
-      [1319, 140], // E6
-      [1568, 140], // G6
-      [2093, 140], // C7
-      [2637, 700], // E7 (sustentada)
-    ];
     let at = 0;
-    for (const [freq, ms] of notes) {
+    for (const [freq, ms] of FIM_NOTES) {
       tone(freq, ms, at, "square", 0.05);
-      at += ms + 20;
+      at += ms + FIM_GAP_MS;
     }
   },
 };
