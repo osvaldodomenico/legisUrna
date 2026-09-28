@@ -46,6 +46,9 @@ for foto in $(grep -oE '"[a-z0-9-]+\.[a-z]+"\),$' src/data/mock-candidates.ts | 
 done
 [ "$FOTOS_OK" -eq 1 ] && pass "fotos dos candidatos presentes e otimizadas"
 
+echo "-- google analytics --"
+if grep -q 'G-NX4YQQ98PE' src/app/layout.tsx && grep -q "Google Analytics" src/app/privacidade/page.tsx; then pass "GA4 no layout e declarado na privacidade"; else fail "GA4 ausente ou não declarado na privacidade"; fi
+
 echo "-- regras --"
 if grep -q "MAJORITARIAN_OFFICES" src/domain/voting/rules.ts && grep -q "isSecondSenatorDuplicate" src/domain/voting/machine.ts; then pass "regras majoritária + anti-repetição"; else fail "regras ausentes"; fi
 

@@ -12,8 +12,8 @@ export default function Privacidade() {
         <p><strong>Simulações (anônimas):</strong> ao ver FIM, a simulação é gravada para uma apuração interna: em cada cargo, se o voto foi para uma candidatura, branco ou nulo. Não gravamos nome, telefone, IP, dispositivo nem o horário exato — só a hora cheia e o estado. Não há como saber quem fez qual simulação. Os resultados são de uso interno e não são divulgados.</p>
         <p><strong>Cadastro opcional:</strong> no fim, você pode escolher receber informações da ShiftLegis pelo WhatsApp. Se aceitar, guardamos nome, WhatsApp, a data e o texto que você autorizou. Esse cadastro fica separado da simulação: não é ligado aos seus votos.</p>
         <p><strong>Seus direitos (LGPD):</strong> responda SAIR a qualquer mensagem da ShiftLegis para sair da lista na hora. Para pedir acesso, correção ou exclusão do cadastro, responda a qualquer mensagem pedindo isso.</p>
-        <p><strong>Analytics:</strong> apenas eventos agregados (simulação iniciada/concluída, uso de branco/corrige), sem candidatura, número ou partido.</p>
-        <p><strong>Cookies:</strong> nenhum de rastreamento. O navegador guarda só uma marca de que você já respondeu o convite, para não perguntar de novo.</p>
+        <p><strong>Analytics:</strong> usamos o Google Analytics para contar visitas e páginas acessadas (dados agregados de navegação, como dispositivo e região aproximada). Seus votos na simulação nunca são enviados: nada de candidatura, número ou partido.</p>
+        <p><strong>Cookies:</strong> o Google Analytics usa cookies de medição de audiência (<code>_ga</code>). Além disso, o navegador guarda só uma marca de que você já respondeu o convite, para não perguntar de novo.</p>
         <p className="text-xs text-slate-500">Dúvidas: use o canal de contato do projeto LegisUrna.</p>
       </div>
     </main>
