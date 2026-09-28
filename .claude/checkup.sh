@@ -37,6 +37,15 @@ if [ -d src/components/urna ] && ! grep -rwiq "TSE\|Justiça Eleitoral\|brasão"
 echo "-- aviso não oficial --"
 if grep -rq "SIMULAÇÃO NÃO OFICIAL" src/components/ui/Disclaimer.tsx src/app/page.tsx 2>/dev/null; then pass "aviso SIMULAÇÃO NÃO OFICIAL"; else fail "aviso não oficial ausente"; fi
 
+echo "-- fotos --"
+FOTOS_OK=1
+for foto in $(grep -oE '"[a-z0-9-]+\.[a-z]+"\),$' src/data/mock-candidates.ts | tr -d '"),'); do
+  arq="public/candidates/$foto"
+  if [ ! -f "$arq" ]; then fail "foto ausente: $arq"; FOTOS_OK=0
+  elif [ "${foto##*.}" != "webp" ] || [ "$(stat -f%z "$arq")" -gt 60000 ]; then fail "foto não otimizada (webp ≤ 60 KB): $arq"; FOTOS_OK=0; fi
+done
+[ "$FOTOS_OK" -eq 1 ] && pass "fotos dos candidatos presentes e otimizadas"
+
 echo "-- regras --"
 if grep -q "MAJORITARIAN_OFFICES" src/domain/voting/rules.ts && grep -q "isSecondSenatorDuplicate" src/domain/voting/machine.ts; then pass "regras majoritária + anti-repetição"; else fail "regras ausentes"; fi
 
