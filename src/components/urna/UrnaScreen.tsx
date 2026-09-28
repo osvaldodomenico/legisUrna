@@ -62,15 +62,11 @@ export function UrnaScreen({ view, message }: { view: ScreenView; message?: stri
               <div className="urna__title">SEU VOTO PARA</div>
               <div className="urna__office">{view.office.label}</div>
               <DigitBoxes digits={view.digits} total={view.office.digits} />
-              {view.joke ? (
-                <div className="urna__center urna__joke">{view.joke}</div>
-              ) : (
-                <div className="urna__center">
-                  NÚMERO ERRADO
-                  <br />
-                  VOTO NULO
-                </div>
-              )}
+              <div className="urna__center">
+                NÚMERO ERRADO
+                <br />
+                VOTO NULO
+              </div>
               {bar(BAR_CONFIRM)}
             </>
           )}

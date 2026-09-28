@@ -121,7 +121,6 @@
   background: var(--key-confirma);
   color: #fff;
 }
-.urna__joke { font-size: 1.3em; padding: 0 5cqw; }
 .urna__fim {
   flex: 1;
   display: flex;

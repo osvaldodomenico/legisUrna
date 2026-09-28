@@ -13,7 +13,7 @@ export default function ComoFunciona() {
         <li>Confira foto, nome de urna e partido. Use <strong>Corrige</strong> para apagar e <strong>Branco</strong> para voto em branco.</li>
         <li>Pressione <strong>Confirma</strong> para avançar ao próximo cargo.</li>
         <li>A ordem é: Senador 1ª vaga → Senador 2ª vaga → Governador → Presidente. A 2ª vaga ao Senado não pode repetir a 1ª.</li>
-        <li>Ao final aparece <strong>FIM</strong>. Nada do que você digitou é enviado a servidor.</li>
+        <li>Ao final aparece <strong>FIM</strong>. A simulação é gravada de forma anônima, sem nenhum dado seu — veja a <a href="/privacidade" className="underline">política de privacidade</a>.</li>
       </ol>
       <p className="text-xs text-slate-500">Teclado físico: 0-9 digitam, Backspace/Esc corrige, B branco, Enter confirma.</p>
     </main>

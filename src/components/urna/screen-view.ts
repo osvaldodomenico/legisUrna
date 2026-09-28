@@ -5,15 +5,10 @@ export type ScreenView =
   | { kind: "idle"; stateName: string | null }
   | { kind: "typing"; office: OfficeConfig; digits: string }
   | { kind: "candidate"; office: OfficeConfig; digits: string; candidate: Candidate }
-  | { kind: "null"; office: OfficeConfig; digits: string; joke?: string }
+  | { kind: "null"; office: OfficeConfig; digits: string }
   | { kind: "invalid"; office: OfficeConfig; digits: string }
   | { kind: "blank"; office: OfficeConfig }
   | { kind: "finished" };
-
-/** Brincadeiras: número sem candidatura que mostra uma mensagem na tela em vez de "NÚMERO ERRADO". */
-export const EASTER_EGGS: Partial<Record<Office, Record<string, string>>> = {
-  president: { "13": "Ai você me quebra né!! kkkkk" },
-};
 
 export function toScreenView(input: {
   started: boolean;
@@ -33,10 +28,8 @@ export function toScreenView(input: {
       return input.foundCandidate
         ? { kind: "candidate", office, digits, candidate: input.foundCandidate }
         : { kind: "typing", office, digits };
-    case "CONFIRM_READY": {
-      const joke = EASTER_EGGS[office.key]?.[digits];
-      return joke ? { kind: "null", office, digits, joke } : { kind: "null", office, digits };
-    }
+    case "CONFIRM_READY":
+      return { kind: "null", office, digits };
     case "INVALID_NUMBER":
       return { kind: "invalid", office, digits };
     default:

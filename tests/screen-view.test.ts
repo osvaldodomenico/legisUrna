@@ -26,12 +26,6 @@ describe("toScreenView", () => {
     expect(toScreenView({ ...base, status: "CONFIRM_READY", digits: "99" })).toEqual({ kind: "null", office: gov, digits: "99" });
     expect(toScreenView({ ...base, status: "INVALID_NUMBER", digits: "99" })).toEqual({ kind: "invalid", office: gov, digits: "99" });
   });
-  it("brincadeira: 13 no presidente mostra a mensagem em vez de NÚMERO ERRADO", () => {
-    const pres = FULL_OFFICES.find((o) => o.key === "president")!;
-    expect(toScreenView({ ...base, office: pres, status: "CONFIRM_READY", digits: "13" }))
-      .toEqual({ kind: "null", office: pres, digits: "13", joke: "Ai você me quebra né!! kkkkk" });
-    expect(toScreenView({ ...base, status: "CONFIRM_READY", digits: "13" })).toEqual({ kind: "null", office: gov, digits: "13" });
-  });
   it("blank em BLANK_PENDING", () => {
     expect(toScreenView({ ...base, status: "BLANK_PENDING" })).toEqual({ kind: "blank", office: gov });
   });

@@ -43,6 +43,16 @@ if grep -q "MAJORITARIAN_OFFICES" src/domain/voting/rules.ts && grep -q "isSecon
 echo "-- privacidade --"
 if grep -v "^[[:space:]]*//" src/lib/analytics.ts | grep -q "candidate_id"; then fail "analytics vaza candidate_id"; else pass "analytics sem PII eleitoral"; fi
 
+echo "-- apuração + contatos --"
+[ -f db/schema.sql ] && pass "db/schema.sql" || fail "db/schema.sql ausente"
+if awk '/CREATE TABLE IF NOT EXISTS contatos/,/\);/' db/schema.sql | grep -qiE "simula|voto"; then fail "tabela contatos ligada à simulação"; else pass "contatos sem vínculo com a simulação"; fi
+if grep -q "date_trunc('hour'" db/schema.sql; then pass "hora da simulação truncada"; else fail "hora da simulação não truncada"; fi
+if grep -q '"/apuracao"' src/proxy.ts && grep -q "APURACAO_SENHA" src/proxy.ts; then pass "/apuracao protegida por senha"; else fail "/apuracao sem proteção"; fi
+if grep -rq "ShiftLegis" src/app/privacidade/page.tsx && ! grep -rq "Nada do que você digita" src/app; then pass "privacidade descreve a coleta"; else fail "privacidade desatualizada"; fi
+if grep -q "SAIR" src/lib/apuracao/consentimento.ts && grep -q "Não, obrigado" src/components/contato/ContatoCard.tsx; then pass "consentimento com opt-out e recusa visível"; else fail "consentimento incompleto"; fi
+if grep -rhE "from \"(@/lib/apuracao|\.)/payload\"" src/components src/lib/apuracao/enviar.ts | grep -qv "^import type"; then fail "zod no bundle do cliente"; else pass "cliente não importa validação do servidor"; fi
+if grep -rq "me quebra" src; then fail "brincadeira do 13 ainda presente"; else pass "brincadeira do 13 removida"; fi
+
 # -- divulga (client TSE, Fase 3) --
 [ -f src/lib/divulgacand/client.ts ] && pass "client divulgacand/client.ts" || fail "client divulgacand/client.ts ausente"
 [ -f src/lib/divulgacand/types.ts ] && pass "client divulgacand/types.ts" || fail "client divulgacand/types.ts ausente"

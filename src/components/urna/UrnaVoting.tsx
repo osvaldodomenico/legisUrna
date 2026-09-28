@@ -7,6 +7,8 @@ import { currentOffice } from "@/domain/voting/rules";
 import { STATES } from "@/data/states";
 import { track } from "@/lib/analytics";
 import { sfx } from "@/lib/audio";
+import { enviarSimulacao } from "@/lib/apuracao/enviar";
+import { ContatoCard } from "@/components/contato/ContatoCard";
 import { toScreenView } from "./screen-view";
 import { UrnaShell } from "./UrnaShell";
 import { UrnaScreen } from "./UrnaScreen";
@@ -81,6 +83,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
     if (nowFinished) {
       sfx.fim();
       track("simulation_completed", { state: stateCode, total_offices: offices.length });
+      enviarSimulacao(stateCode, useVotingSession.getState().votes);
     } else {
       sfx.confirm();
       track("office_completed", { office: office?.key ?? "", index: currentIndex + 1 });
@@ -139,6 +142,8 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
           />
         }
       />
+
+      {finished && <ContatoCard />}
 
       {finished && (
         <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">

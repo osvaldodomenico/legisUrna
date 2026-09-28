@@ -5,6 +5,9 @@ const party = (number: number, acronym: string, name: string): Party => ({ numbe
 const REP = party(10, "REPUBLICANOS", "Republicanos");
 const PP = party(11, "PP", "Progressistas");
 const PL = party(22, "PL", "Partido Liberal");
+const PT = party(13, "PT", "Partido dos Trabalhadores");
+const MDB = party(15, "MDB", "Movimento Democrático Brasileiro");
+const REDE = party(18, "REDE", "Rede Sustentabilidade");
 
 const mk = (
   id: string,
@@ -38,4 +41,11 @@ export const MOCK_CANDIDATES: Candidate[] = [
   mk("sp-sen-andre-do-prado", "senator_2", "222", "ANDRE DO PRADO", "André do Prado", PL, "SP", "sp-sen-andre-do-prado.jpg"),
   mk("sp-gov-tarcisio", "governor", "10", "TARCISIO DE FREITAS", "Tarcisio de Freitas", REP, "SP", "sp-gov-tarcisio.jpg"),
   mk("br-pres-flavio-bolsonaro", "president", "22", "FLAVIO BOLSONARO", "Flavio Bolsonaro", PL, null, "br-pres-flavio-bolsonaro.jpg"),
+  // Lote 2 (2026-09-28). Gilmaci: número de 2022. Marina 181 e Tebet 151 são PROVISÓRIOS
+  // (padrão partido + 1) — confirmar o oficial. Fotos chegam depois; sem arquivo a foto só não aparece.
+  mk("sp-dep-est-gilmaci", "state_deputy", "10123", "GILMACI SANTOS", "Gilmaci Santos", REP, "SP", "sp-dep-est-gilmaci.jpg"),
+  mk("sp-sen-marina-silva", "senator_1", "181", "MARINA SILVA", "Marina Silva", REDE, "SP", "sp-sen-marina-silva.jpg"),
+  mk("sp-sen-simone-tebet", "senator_1", "151", "SIMONE TEBET", "Simone Tebet", MDB, "SP", "sp-sen-simone-tebet.jpg"),
+  mk("sp-gov-haddad", "governor", "13", "FERNANDO HADDAD", "Fernando Haddad", PT, "SP", "sp-gov-haddad.jpg"),
+  mk("br-pres-lula", "president", "13", "LULA", "Luiz Inácio Lula da Silva", PT, null, "br-pres-lula.jpg"),
 ];
