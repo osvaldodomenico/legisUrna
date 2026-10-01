@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { montarColinha } from "@/components/colinha/linhas";
+import { montarColinha, textoWhatsapp } from "@/components/colinha/linhas";
 import { FULL_OFFICES } from "@/domain/voting/rules";
 import { MOCK_CANDIDATES } from "@/data/mock-candidates";
 import type { Office, Vote } from "@/domain/voting/types";
@@ -27,5 +27,22 @@ describe("montarColinha", () => {
 
   it("ignora cargo ainda sem voto", () => {
     expect(montarColinha(FULL_OFFICES, {}, MOCK_CANDIDATES)).toEqual([]);
+  });
+});
+
+describe("textoWhatsapp", () => {
+  it("colinha em texto, com branco, nulo e o link do simulador", () => {
+    const t = textoWhatsapp([
+      { cargo: "Deputado Federal", numero: "1055", tipo: "candidate", nome: "MILTON VIEIRA", partido: "REPUBLICANOS", foto: null },
+      { cargo: "Deputado Estadual ou Distrital", numero: "", tipo: "blank", nome: null, partido: null, foto: null },
+      { cargo: "Senador — 2ª vaga", numero: "999", tipo: "null", nome: null, partido: null, foto: null },
+    ], "https://simulador.shiftlegis.com.br");
+    expect(t).toBe([
+      "Minha colinha para 2026 (simulação não oficial):", "",
+      "Deputado Federal: 1055 - MILTON VIEIRA",
+      "Deputado Estadual ou Distrital: BRANCO",
+      "Senador — 2ª vaga: 999 (nulo)", "",
+      "Faça a sua: https://simulador.shiftlegis.com.br",
+    ].join("\n"));
   });
 });

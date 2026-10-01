@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
-import type { LinhaColinha } from "./linhas";
+import { textoWhatsapp, type LinhaColinha } from "./linhas";
 
 const ARQUIVO = "minha-colinha.png";
 const AVISO = "Confira sempre o número do candidato na urna.";
@@ -23,9 +23,8 @@ export function ColinhaModal({ linhas, onClose }: { linhas: LinhaColinha[]; onCl
     setErro(null);
     try {
       await acao(await desenharColinha(linhas));
-    } catch (e) {
-      // Fechar a folha de compartilhar do celular dispara AbortError: não é falha.
-      if (!(e instanceof DOMException && e.name === "AbortError")) setErro("Não foi possível gerar a imagem. Tente de novo.");
+    } catch {
+      setErro("Não foi possível gerar a imagem. Tente de novo.");
     } finally {
       setOcupado(false);
     }
@@ -36,17 +35,11 @@ export function ColinhaModal({ linhas, onClose }: { linhas: LinhaColinha[]; onCl
     track("colinha_saved", {});
   });
 
-  const compartilhar = () => comImagem(async (png) => {
-    const arquivo = new File([png], ARQUIVO, { type: "image/png" });
-    if (navigator.canShare?.({ files: [arquivo] })) {
-      await navigator.share({ files: [arquivo], title: "Minha colinha", text: `Minha colinha para 2026. Faça a sua: ${location.origin}` });
-    } else if (navigator.share) {
-      await navigator.share({ title: "Simulador de votação 2026", url: location.origin });
-    } else {
-      baixar(png);
-    }
+  // Link wa.me abre o app no celular e o WhatsApp Web no computador, já com o texto.
+  const whatsapp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(textoWhatsapp(linhas, location.origin))}`, "_blank", "noopener");
     track("colinha_shared", {});
-  });
+  };
 
   return (
     <dialog
@@ -94,8 +87,8 @@ export function ColinhaModal({ linhas, onClose }: { linhas: LinhaColinha[]; onCl
         <button type="button" onClick={salvar} disabled={ocupado} className="rounded-md bg-slate-900 px-3 py-2 font-semibold text-white disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900">
           Salvar imagem
         </button>
-        <button type="button" onClick={compartilhar} disabled={ocupado} className="rounded-md border border-slate-400 px-3 py-2 font-semibold disabled:opacity-60 dark:border-slate-500">
-          Compartilhar com amigos
+        <button type="button" onClick={whatsapp} className="rounded-md border border-slate-400 px-3 py-2 font-semibold dark:border-slate-500">
+          Compartilhar com amigos no WhatsApp
         </button>
       </div>
       {erro && <p className="mt-2 text-xs font-semibold text-red-700 dark:text-red-400" role="alert">{erro}</p>}

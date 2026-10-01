@@ -30,3 +30,13 @@ export function montarColinha(
     }];
   });
 }
+
+/** Mensagem do botão do WhatsApp: a colinha em texto + o link do simulador
+ *  (o link wa.me só leva texto; a imagem fica no "Salvar imagem"). */
+export function textoWhatsapp(linhas: LinhaColinha[], site: string): string {
+  const corpo = linhas.map((l) => {
+    const voto = l.tipo === "blank" ? "BRANCO" : l.tipo === "null" ? `${l.numero} (nulo)` : `${l.numero} - ${l.nome}`;
+    return `${l.cargo}: ${voto}`;
+  });
+  return ["Minha colinha para 2026 (simulação não oficial):", "", ...corpo, "", `Faça a sua: ${site}`].join("\n");
+}
