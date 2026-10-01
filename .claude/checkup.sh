@@ -70,6 +70,8 @@ if grep -q "<ColinhaModal " src/components/urna/UrnaVoting.tsx && [ -f tests/col
 if grep -q "SIMULAÇÃO NÃO OFICIAL" src/components/colinha/Colinha.tsx; then pass "imagem da colinha leva o aviso NÃO OFICIAL"; else fail "imagem da colinha sem aviso NÃO OFICIAL"; fi
 if grep -qE "fetch\(|enviar" src/components/colinha/Colinha.tsx; then fail "colinha envia dados ao servidor"; else pass "colinha só no aparelho (sem envio)"; fi
 
+if grep -q "ondevotar.shiftlegis.com.br" src/components/colinha/Colinha.tsx; then pass "colinha leva ao Onde Votar"; else fail "botão Onde Votar ausente na colinha"; fi
+
 # -- candidatos do TSE + busca por nome --
 N=$(grep -o '"sq"' src/data/candidatos-sp.json | wc -l | tr -d ' ')
 if [ "$N" -gt 2000 ]; then pass "candidatos do TSE importados ($N)"; else fail "candidatos do TSE ausentes ($N)"; fi

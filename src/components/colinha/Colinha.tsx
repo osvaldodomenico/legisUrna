@@ -90,6 +90,9 @@ export function ColinhaModal({ linhas, onClose }: { linhas: LinhaColinha[]; onCl
         <button type="button" onClick={whatsapp} className="rounded-md border border-slate-400 px-3 py-2 font-semibold dark:border-slate-500">
           Compartilhar com amigos no WhatsApp
         </button>
+        <a href="https://ondevotar.shiftlegis.com.br" target="_blank" rel="noopener noreferrer" className="rounded-md border border-slate-400 px-3 py-2 text-center font-semibold dark:border-slate-500">
+          Onde votar? Encontre seu local
+        </a>
       </div>
       {erro && <p className="mt-2 text-xs font-semibold text-red-700 dark:text-red-400" role="alert">{erro}</p>}
       <p className="mt-3 text-center text-xs text-slate-600 dark:text-slate-400">{AVISO} Simulação não oficial.</p>
