@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LegisUrna
 
-## Getting Started
+Simulador de votação (urna eletrônica) para as eleições de 2026: simule seu voto,
+confira o Effect 2009 da urna e veja a apuração agregada da simulação.
 
-First, run the development server:
+## Rodando
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev:db        # banco Postgres local (PGlite) — Ctrl-C encerra
+pnpm dev           # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O `pnpm dev:db` imprime a `DATABASE_URL` para colar no `.env.local` (veja `.env.example`).
+Para deixar o banco em background (um terminal só): `pnpm dev:db:bg`, e `pnpm dev:db:stop` para derrubar.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Telas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Rota         | O que é                                                            |
+| ------------ | ------------------------------------------------------------------ |
+| `/`          | Simulador: escolha o estado, os candidatos e vote                   |
+| `/apuracao`  | Resultado agregado da simulação — uso interno, exige `APURACAO_SENHA` |
+| `/como-funciona` | Como a urna real funciona (obrigatório, fonte do TSE)             |
+| `/privacidade`, `/termos` | Texto de privacidade e termos                              |
 
-## Learn More
+## Banco
 
-To learn more about Next.js, take a look at the following resources:
+Postgres. Em desenvolvimento, `pnpm dev:db` sobe um PGlite (Postgres em WASM) num socket
+TCP local e aplica `db/schema.sql` sozinho. Em produção use a URL do provedor e
+aplique o schema com `psql "$DATABASE_URL" -f db/schema.sql`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+O PGlite atende uma conexão por vez: o pool fica com `DATABASE_MAX=1` (veja `.env.example`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Comando            | O que faz                                        |
+| ------------------ | ------------------------------------------------ |
+| `pnpm dev`         | servidor de desenvolvimento                       |
+| `pnpm build`       | build de produção                                 |
+| `pnpm lint`        | ESLint                                            |
+| `pnpm test`        | Vitest (inclui testes de banco com PGlite)        |
+| `pnpm dev:db[:bg]` | banco local; `pnpm dev:db:stop` derruba           |

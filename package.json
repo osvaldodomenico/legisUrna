@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:db": "tsx scripts/dev-db.ts",
+    "dev:db:bg": "tsx scripts/dev-db.ts --background",
+    "dev:db:stop": "tsx scripts/dev-db.ts --stop"
   },
   "dependencies": {
     "framer-motion": "^13.4.4",
@@ -28,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.2"
   },

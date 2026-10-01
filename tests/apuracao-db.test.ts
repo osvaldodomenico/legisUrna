@@ -13,7 +13,8 @@ import type { SimulacaoGravavel } from "@/lib/apuracao/payload";
 let pg: PGlite;
 let server: PGLiteSocketServer;
 let sql: postgres.Sql;
-const PORT = 54329;
+// porta fora da do pnpm dev:db (54329), para os testes rodarem com o dev ligado
+const PORT = Number(process.env.TEST_DB_PORT ?? 54330);
 
 beforeAll(async () => {
   pg = await PGlite.create();
