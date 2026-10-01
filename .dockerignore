@@ -12,3 +12,7 @@ coverage
 # screenshots/mockups fora do contexto de build
 docs
 .superpowers
+
+# arquivo-fonte pesado, não é necessário na imagem
+*.psd
+*.psb
