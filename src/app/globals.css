@@ -4,12 +4,29 @@
 :root {
   color-scheme: light dark;
 
+  /* Paleta de marca "MINHA COLINHA" — extraída de public/cabecalho.png. Fonte única de verdade.
+     Não usar famílias slate/amber/emerald/teal-* do Tailwind nas telas: usar utilitários `mc-*` abaixo. */
+  --mc-preto: #000000;
+  --mc-escuro: #141414;
+  --mc-cinza: #2a2a2a;
+  --mc-borda: #3d3d3d;
+  --mc-texto: #f5f5f5;
+  --mc-apagado: #a3a3a3;
+  --mc-amarelo: #fce454;
+  --mc-verde: #44a138;
+  --mc-teal: #2d8892;
+  --mc-erro: #ff5c5c;
+  --mc-fundo: #ffffff;
+  --mc-superficie: #ffffff;
+  --mc-borda-suave: #e5e5e2;
+  --mc-texto-fraco: #6b6b6b;
+
   /* Urna (objeto físico — não muda com o tema) */
   --urna-body: #e8e4d8;
   --urna-body-dark: #cfcabb;
   --urna-bezel: #1f2327;
-  --urna-screen: #f4f4ef;
-  --urna-ink: #111111;
+  --urna-screen: var(--mc-escuro);
+  --urna-ink: var(--mc-texto);
   --urna-panel: #24282c;
   --key-dark: #2f343a;
   --key-dark-edge: #0b0d0f;
@@ -18,20 +35,105 @@
   --key-confirma: #1f9d55;
 
   /* Palco (fundo da página — único token que segue o tema) */
-  --stage: #eef0f2;
+  --stage: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --stage: #0f172a;
+    --stage: #000000;
+    --mc-fundo: #000000;
+    --mc-superficie: #141414;
+    --mc-borda: #262626;
+    --mc-borda-suave: #262626;
+    --mc-texto-fraco: #a3a3a3;
   }
 }
 
 :root[data-theme="dark"] {
-  --stage: #0f172a;
+  --stage: #000000;
+  --mc-fundo: #000000;
+  --mc-superficie: #141414;
+  --mc-borda: #262626;
+  --mc-borda-suave: #262626;
+  --mc-texto-fraco: #a3a3a3;
+}
+
+/* Utilitários de cor da marca. Substituem as famílias slate/amber/emerald/teal-*.
+   mc-txt = texto principal (claro: quase-preto; escuro: branco)
+   mc-sub = texto secundário   mc-fraco = texto terciário / dica
+   mc-card = superfície + borda    mc-aviso = caixa de aviso (amarelo)   mc-erro = caixa de erro
+   mc-btn / mc-btn-hover = botão primário   mc-btn-alt = botão secundário (borda)
+   mc-link = link de texto   mc-pill = etiqueta pequena
+   Todo elemento focável com these classes recebe foco amarelo visível. */
+@theme inline {
+  --color-mc-txt: var(--mc-texto-0);
+  --color-mc-sub: var(--mc-texto-2);
+  --color-mc-fraco: var(--mc-texto-fraco);
+  --color-mc-card: var(--mc-superficie);
+  --color-mc-borda: var(--mc-borda);
+  --color-mc-fundo: var(--mc-fundo);
+  --color-mc-accent: var(--mc-teal);
+  --color-mc-amarelo: var(--mc-amarelo);
+  --color-mc-verde: var(--mc-verde);
+  --color-mc-escuro: var(--mc-escuro);
+  --color-mc-cinza: var(--mc-cinza);
+  --color-mc-erro: var(--mc-erro);
+}
+:root { --mc-texto-0: #141414; --mc-texto-2: #4a4a4a; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --mc-texto-0: #f5f5f5; --mc-texto-2: #c9c9c9; }
+}
+:root[data-theme="dark"] { --mc-texto-0: #f5f5f5; --mc-texto-2: #c9c9c9; }
+
+.mc-txt { color: var(--mc-texto-0); }
+.mc-sub { color: var(--mc-texto-2); }
+.mc-fraco { color: var(--mc-texto-fraco); }
+.mc-accent { color: var(--mc-teal); }
+.mc-aviso { background: var(--mc-amarelo); color: var(--mc-escuro); border-color: var(--mc-amarelo); }
+.mc-erro-txt { color: #b3261e; }
+.mc-erro-box { background: #fdeceb; color: #7a1c16; border-color: #f3b9b5; }
+.mc-btn { background: var(--mc-escuro); color: #fff; }
+.mc-btn:hover { background: var(--mc-cinza); }
+.mc-btn-accent { background: var(--mc-teal); color: #fff; }
+.mc-btn-accent:hover { background: #256f78; }
+.mc-btn-alt { border-color: var(--mc-borda); color: var(--mc-texto-0); background: var(--mc-superficie); }
+.mc-btn-alt:hover { background: color-mix(in srgb, var(--mc-texto-0) 8%, var(--mc-superficie)); }
+.mc-card { background: var(--mc-superficie); border-color: var(--mc-borda-suave); }
+.mc-pill { background: var(--mc-amarelo); color: var(--mc-escuro); }
+.mc-pill-accent { background: var(--mc-teal); color: #fff; }
+.mc-divide > * + * { border-color: var(--mc-borda-suave); }
+.mc-backdrop { background: rgb(0 0 0 / 0.62); }
+.mc-focus:focus-visible, .mc-txt:focus-visible, .mc-sub:focus-visible, .mc-fraco:focus-visible,
+.mc-btn:focus-visible, .mc-btn-accent:focus-visible, .mc-btn-alt:focus-visible, .mc-link:focus-visible,
+.mc-accent:focus-visible, .mc-aviso:focus-visible, .mc-pill:focus-visible {
+  outline: 2px solid var(--mc-amarelo);
+  outline-offset: 2px;
+}
+.mc-link { color: var(--mc-teal); text-decoration: underline; text-underline-offset: 4px; font-weight: 600; }
+.mc-link:hover { color: #1f6b74; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .mc-erro-txt { color: #ff8a80; }
+    .mc-erro-box { background: #2a0f0d; color: #ffb4ab; border-color: #5c1f1a; }
+    .mc-btn { background: var(--mc-teal); color: #fff; }
+    .mc-btn:hover { background: #3aa0ab; }
+    .mc-btn-alt { background: var(--mc-cinza); }
+    .mc-btn-alt:hover { background: #3a3a3a; }
+    .mc-link:hover { color: #6fc6cf; }
+  }
+}
+:root[data-theme="dark"] {
+  .mc-erro-txt { color: #ff8a80; }
+  .mc-erro-box { background: #2a0f0d; color: #ffb4ab; border-color: #5c1f1a; }
+  .mc-btn { background: var(--mc-teal); color: #fff; }
+  .mc-btn:hover { background: #3aa0ab; }
+  .mc-btn-alt { background: var(--mc-cinza); }
+  .mc-btn-alt:hover { background: #3a3a3a; }
+  .mc-link:hover { color: #6fc6cf; }
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: var(--stage);
+  color: var(--mc-texto-0);
 }

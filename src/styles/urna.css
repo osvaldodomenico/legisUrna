@@ -152,7 +152,7 @@
   width: 1.5em;
   height: 1.9em;
   border: 1.5px solid var(--urna-ink);
-  background: #fff;
+  background: #0a0a0a;
   font-size: 1.25em;
   font-weight: 700;
 }
@@ -170,8 +170,8 @@
   display: block;
   object-fit: cover;
   object-position: top;
-  border: 1px solid #555;
-  background: #c9ced4;
+  border: 1px solid var(--mc-borda);
+  background: #2a2a2a;
 }
 .urna__photo--main { width: 23cqw; height: 30.5cqw; }
 .urna__photo--mate { width: 10cqw; height: 13cqw; }
