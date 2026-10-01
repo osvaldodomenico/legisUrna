@@ -41,8 +41,17 @@ describe("CANDIDATOS (TSE)", () => {
     expect(lookupCandidate(CANDIDATOS, office("senator_2"), "180", "SP")?.id).toBe("sp-sen-marina-silva");
   });
 
+  it("vice e suplentes vêm junto do titular", () => {
+    const lula = CANDIDATOS.find((c) => c.id === "br-pres-lula")!;
+    expect(lula.runningMates.map((m) => [m.role, m.ballotName])).toEqual([["vice", "GERALDO ALCKMIN"]]);
+    const derrite = CANDIDATOS.find((c) => c.id === "sp-sen-guilherme-derrite")!;
+    expect(derrite.runningMates.map((m) => m.role)).toEqual(["first_alternate", "second_alternate"]);
+    expect(derrite.runningMates.every((m) => m.photoUrl?.startsWith("/candidates/tse/"))).toBe(true);
+    expect(CANDIDATOS.filter((c) => c.office.includes("deputy")).every((c) => c.runningMates.length === 0)).toBe(true);
+  });
+
   it("o JSON não carrega dado pessoal do TSE", () => {
     const chaves = new Set((tse as object[]).flatMap((l) => Object.keys(l)));
-    expect([...chaves].sort()).toEqual(["cargo", "foto", "nome", "nrPartido", "numero", "partido", "sq", "uf"]);
+    expect([...chaves].sort()).toEqual(["cargo", "foto", "nome", "nrPartido", "numero", "partido", "sq", "uf", "vices"]);
   });
 });

@@ -28,6 +28,14 @@ const CARGOS: Record<string, string> = {
   PRESIDENTE: "president",
 };
 
+/** Vice e suplentes: entram junto do titular de mesmo número. */
+const COMPANHEIROS: Record<string, [string, "vice" | "first_alternate" | "second_alternate"]> = {
+  "VICE-GOVERNADOR": ["governor", "vice"],
+  "VICE-PRESIDENTE": ["president", "vice"],
+  "1º SUPLENTE": ["senator", "first_alternate"],
+  "2º SUPLENTE": ["senator", "second_alternate"],
+};
+
 /** CSV do TSE: separador `;`, texto entre aspas e números sem aspas. */
 function lerCsv(texto: string): Record<string, string>[] {
   const linhas = texto.split(/\r?\n/).filter(Boolean);
@@ -57,27 +65,41 @@ async function main() {
     // Número repetido no mesmo cargo = substituição: fica o registro mais recente (maior SQ).
     const porNumero = new Map<string, Record<string, string>>();
     const repetidos: string[] = [];
-    for (const l of linhas) {
-      const cargo = CARGOS[l.DS_CARGO];
-      if (!cargo) continue;
-      const chave = `${cargo.startsWith("senator") ? "senator" : cargo}:${l.NR_CANDIDATO}`;
+    const guardar = (chave: string, l: Record<string, string>) => {
       const atual = porNumero.get(chave);
       if (atual) repetidos.push(`${l.DS_CARGO} ${l.NR_CANDIDATO}: ${atual.NM_URNA_CANDIDATO} / ${l.NM_URNA_CANDIDATO}`);
       if (!atual || BigInt(l.SQ_CANDIDATO) > BigInt(atual.SQ_CANDIDATO)) porNumero.set(chave, l);
+    };
+    for (const l of linhas) {
+      const cargo = CARGOS[l.DS_CARGO];
+      if (cargo) guardar(`${cargo.startsWith("senator") ? "senator" : cargo}:${l.NR_CANDIDATO}`, l);
+      const comp = COMPANHEIROS[l.DS_CARGO];
+      if (comp) guardar(`${comp[1]}@${comp[0]}:${l.NR_CANDIDATO}`, l);
     }
 
     const fotos = new Map(readdirSync(join(tmp, "fotos")).map((f) => [f.replace(/^F(SP|BR)(\d+)_div\.\w+$/i, "$2"), f]));
     mkdirSync(SAIDA_FOTOS, { recursive: true });
     let semFoto = 0;
-    const candidatos = [...porNumero.values()]
-      .sort((a, b) => a.DS_CARGO.localeCompare(b.DS_CARGO) || a.NR_CANDIDATO.localeCompare(b.NR_CANDIDATO))
-      .map((l) => {
+    const converter = (sq: string) => {
+      const foto = fotos.get(sq);
+      if (!foto) { semFoto++; return false; }
+      const destino = join(SAIDA_FOTOS, `${sq}.webp`);
+      if (!existsSync(destino)) execFileSync("cwebp", ["-quiet", "-q", "70", join(tmp, "fotos", foto), "-o", destino]);
+      return true;
+    };
+    let vices = 0;
+    const candidatos = [...porNumero.entries()]
+      .filter(([chave]) => !chave.includes("@"))
+      .map(([chave, l]) => [chave.split(":")[0], l] as const)
+      .sort(([, a], [, b]) => a.DS_CARGO.localeCompare(b.DS_CARGO) || a.NR_CANDIDATO.localeCompare(b.NR_CANDIDATO))
+      .map(([grupo, l]) => {
         const sq = l.SQ_CANDIDATO;
-        const foto = fotos.get(sq);
-        if (foto) {
-          const destino = join(SAIDA_FOTOS, `${sq}.webp`);
-          if (!existsSync(destino)) execFileSync("cwebp", ["-quiet", "-q", "70", join(tmp, "fotos", foto), "-o", destino]);
-        } else semFoto++;
+        const companheiros = (["vice", "first_alternate", "second_alternate"] as const).flatMap((papel) => {
+          const c = porNumero.get(`${papel}@${grupo}:${l.NR_CANDIDATO}`);
+          if (!c) return [];
+          vices++;
+          return [{ papel, sq: c.SQ_CANDIDATO, nome: c.NM_URNA_CANDIDATO, foto: converter(c.SQ_CANDIDATO) }];
+        });
         return {
           sq,
           cargo: CARGOS[l.DS_CARGO],
@@ -86,12 +108,13 @@ async function main() {
           partido: l.SG_PARTIDO,
           nrPartido: Number(l.NR_PARTIDO),
           uf: l.SG_UF === "BR" ? null : l.SG_UF,
-          foto: Boolean(foto),
+          foto: converter(sq),
+          ...(companheiros.length ? { vices: companheiros } : {}),
         };
       });
 
     writeFileSync(SAIDA_JSON, JSON.stringify(candidatos) + "\n");
-    console.log(`${candidatos.length} candidatos gravados (${semFoto} sem foto).`);
+    console.log(`${candidatos.length} candidatos e ${vices} vices/suplentes gravados (${semFoto} sem foto).`);
     if (repetidos.length) console.log("Números repetidos (ficou o registro mais recente):\n  " + repetidos.join("\n  "));
   } finally {
     rmSync(tmp, { recursive: true, force: true });

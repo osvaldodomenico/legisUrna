@@ -1,4 +1,4 @@
-import type { Candidate, Office } from "@/domain/voting/types";
+import type { Candidate, Office, RunningMate } from "@/domain/voting/types";
 import { MOCK_CANDIDATES } from "./mock-candidates";
 import tse from "./candidatos-sp.json";
 
@@ -11,6 +11,7 @@ interface LinhaTse {
   nrPartido: number;
   uf: string | null;
   foto: boolean;
+  vices?: { papel: RunningMate["role"]; sq: string; nome: string; foto: boolean }[];
 }
 
 const chave = (office: Office, numero: string) =>
@@ -33,6 +34,11 @@ export const CANDIDATOS: Candidate[] = (tse as LinhaTse[]).map((l) => {
     party: { number: l.nrPartido, acronym: l.partido, name: l.partido },
     photoUrl: antigo?.photoUrl ?? (l.foto ? `/candidates/tse/${l.sq}.webp` : ""),
     stateCode: l.uf,
-    runningMates: [],
+    runningMates: (l.vices ?? []).map((v, i) => ({
+      role: v.papel,
+      ballotName: v.nome,
+      photoUrl: v.foto ? `/candidates/tse/${v.sq}.webp` : undefined,
+      order: i,
+    })),
   };
 });
