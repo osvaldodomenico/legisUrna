@@ -1,15 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import type { LinhaColinha } from "./linhas";
 
 const ARQUIVO = "minha-colinha.png";
 const AVISO = "Confira sempre o número do candidato na urna.";
 
-/** Colinha do fim da votação: os números confirmados, para levar no dia da eleição.
- *  Tudo acontece no aparelho — a imagem é desenhada num canvas e nada vai para o servidor. */
-export function Colinha({ linhas }: { linhas: LinhaColinha[] }) {
+/** Colinha do fim da votação, em `<dialog>` nativo: os números confirmados, para levar no dia
+ *  da eleição. Tudo acontece no aparelho — a imagem é desenhada num canvas e nada vai para o servidor. */
+export function ColinhaModal({ linhas, onClose }: { linhas: LinhaColinha[]; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const d = ref.current;
+    if (d && !d.open) d.showModal();
+  }, []);
   const [ocupado, setOcupado] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -44,7 +49,15 @@ export function Colinha({ linhas }: { linhas: LinhaColinha[] }) {
   });
 
   return (
-    <section aria-labelledby="colinha-titulo" className="w-full max-w-md rounded-lg border border-slate-300 bg-white p-4 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+    <dialog
+      ref={ref}
+      aria-labelledby="colinha-titulo"
+      onCancel={(e) => { e.preventDefault(); onClose(); }}
+      className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-lg border border-slate-300 bg-white p-4 text-slate-900 shadow-lg backdrop:bg-black/60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+    >
+      <button type="button" onClick={onClose} aria-label="Fechar" className="absolute top-2 right-2 rounded p-1 text-2xl leading-none opacity-70 hover:opacity-100">
+        ×
+      </button>
       <h2 id="colinha-titulo" className="text-center text-lg font-bold tracking-wide uppercase">Sua colinha</h2>
       <p className="mb-3 text-center text-xs text-slate-600 dark:text-slate-400">Os números que você confirmou, para levar no dia da eleição.</p>
 
@@ -87,7 +100,7 @@ export function Colinha({ linhas }: { linhas: LinhaColinha[] }) {
       </div>
       {erro && <p className="mt-2 text-xs font-semibold text-red-700 dark:text-red-400" role="alert">{erro}</p>}
       <p className="mt-3 text-center text-xs text-slate-600 dark:text-slate-400">{AVISO} Simulação não oficial.</p>
-    </section>
+    </dialog>
   );
 }
 

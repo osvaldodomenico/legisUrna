@@ -8,8 +8,7 @@ import { STATES } from "@/data/states";
 import { track } from "@/lib/analytics";
 import { FIM_MS, sfx } from "@/lib/audio";
 import { enviarSimulacao } from "@/lib/apuracao/enviar";
-import { ContatoCard } from "@/components/contato/ContatoCard";
-import { Colinha } from "@/components/colinha/Colinha";
+import { ColinhaModal } from "@/components/colinha/Colinha";
 import { montarColinha } from "@/components/colinha/linhas";
 import { toScreenView } from "./screen-view";
 import { UrnaShell } from "./UrnaShell";
@@ -33,9 +32,10 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   const [pressedKey, setPressedKey] = useState<KeyId | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restartButtonRef = useRef<HTMLButtonElement | null>(null);
-  // Convite de contato abre em modal só quando o jingle do FIM termina.
-  const [convite, setConvite] = useState(false);
-  const conviteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // A colinha abre em modal só quando o jingle do FIM termina. O convite de contato
+  // (ContatoCard) está fora por decisão do Domenico em 2026-10-01.
+  const [colinha, setColinha] = useState(false);
+  const colinhaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const office = currentOffice(offices, currentIndex);
   const stateName = STATES.find((s) => s.code === stateCode)?.name ?? null;
@@ -49,7 +49,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   }, []);
   useEffect(() => () => {
     if (flashTimer.current) clearTimeout(flashTimer.current);
-    if (conviteTimer.current) clearTimeout(conviteTimer.current);
+    if (colinhaTimer.current) clearTimeout(colinhaTimer.current);
   }, []);
   useEffect(() => { if (finished) restartButtonRef.current?.focus(); }, [finished]);
 
@@ -90,7 +90,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
     const nowFinished = useVotingSession.getState().status === "FINISHED";
     if (nowFinished) {
       sfx.fim();
-      conviteTimer.current = setTimeout(() => setConvite(true), FIM_MS);
+      colinhaTimer.current = setTimeout(() => setColinha(true), FIM_MS);
       track("simulation_completed", { state: stateCode, total_offices: offices.length });
       enviarSimulacao(stateCode, useVotingSession.getState().votes);
     } else {
@@ -102,8 +102,8 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   const onRestart = useCallback(() => {
     restart();
     setStarted(false);
-    if (conviteTimer.current) clearTimeout(conviteTimer.current);
-    setConvite(false);
+    if (colinhaTimer.current) clearTimeout(colinhaTimer.current);
+    setColinha(false);
   }, [restart]);
 
   // --- teclado físico ---
@@ -154,9 +154,15 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
         }
       />
 
-      {finished && convite && <ContatoCard />}
+      {finished && colinha && (
+        <ColinhaModal linhas={montarColinha(offices, votes, candidates)} onClose={() => setColinha(false)} />
+      )}
 
-      {finished && <Colinha linhas={montarColinha(offices, votes, candidates)} />}
+      {finished && (
+        <button type="button" onClick={() => setColinha(true)} className="urna-key urna-key--fn urna-key--branco w-full max-w-md !text-base">
+          Ver minha colinha
+        </button>
+      )}
 
       {finished && (
         <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
