@@ -37,3 +37,7 @@ yarn-error.log*
 # scripts
 .claude/checkup.log
 .superpowers/
+
+# pglite
+.vitest/
+*.psd
