@@ -45,9 +45,21 @@ export function ColinhaModal({ linhas, onClose }: { linhas: LinhaColinha[]; onCl
     track("colinha_saved", {});
   };
 
-  // Link wa.me abre o app no celular e o WhatsApp Web no computador, já com o texto.
-  const whatsapp = () => {
-    window.open(`https://wa.me/?text=${encodeURIComponent(textoWhatsapp(linhas, location.origin))}`, "_blank", "noopener");
+  // Com suporte a arquivo (celular), abre o compartilhar do sistema com a IMAGEM + texto — o
+  // usuário escolhe o WhatsApp. Sem suporte (a maioria dos computadores), cai no wa.me só com o texto.
+  const whatsapp = async () => {
+    const text = textoWhatsapp(linhas, location.origin);
+    const file = png && new File([png], ARQUIVO, { type: "image/png" });
+    if (file && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], text });
+        track("colinha_shared", {});
+      } catch {
+        // AbortError = usuário fechou o compartilhar; nada a fazer.
+      }
+      return;
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
     track("colinha_shared", {});
   };
 
