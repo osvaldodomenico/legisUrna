@@ -9,6 +9,7 @@ import { track } from "@/lib/analytics";
 import { FIM_MS, sfx } from "@/lib/audio";
 import { enviarSimulacao } from "@/lib/apuracao/enviar";
 import { ColinhaModal } from "@/components/colinha/Colinha";
+import { BuscaCandidato } from "@/components/busca/BuscaCandidato";
 import { montarColinha } from "@/components/colinha/linhas";
 import { toScreenView } from "./screen-view";
 import { UrnaShell } from "./UrnaShell";
@@ -35,6 +36,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   // A colinha abre em modal só quando o jingle do FIM termina. O convite de contato
   // (ContatoCard) está fora por decisão do Domenico em 2026-10-01.
   const [colinha, setColinha] = useState(false);
+  const [busca, setBusca] = useState(false);
   const colinhaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const office = currentOffice(offices, currentIndex);
@@ -99,6 +101,14 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
     }
   }, [finished, started, confirm, stateCode, offices.length, office?.key, currentIndex]);
 
+  // Busca por nome: digita o número escolhido do zero, como se a pessoa tivesse teclado.
+  const onEscolher = useCallback((numero: string) => {
+    setBusca(false);
+    pressCorrect();
+    for (const d of numero) pressDigit(d);
+    sfx.digit();
+  }, [pressCorrect, pressDigit]);
+
   const onRestart = useCallback(() => {
     restart();
     setStarted(false);
@@ -110,6 +120,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.repeat) return;
+      if (busca) return; // o modal de busca cuida das próprias teclas
       if (finished) return; // Enter/Espaço devem continuar ativando os botões abaixo da urna
       if (e.ctrlKey || e.metaKey || e.altKey) return; // atalhos do navegador (Cmd+B, Cmd+1…)
       const tag = (e.target as HTMLElement | null)?.tagName;
@@ -123,7 +134,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [finished, flash, onDigit, onCorrect, onConfirm, onBlank]);
+  }, [busca, finished, flash, onDigit, onCorrect, onConfirm, onBlank]);
 
   // --- leitor de tela ---
   const live =
@@ -153,6 +164,16 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
           />
         }
       />
+
+      {started && !finished && office && (
+        <button type="button" onClick={() => setBusca(true)} className="urna-key urna-key--fn urna-key--branco w-full max-w-md !text-base">
+          Não sabe o número? Buscar pelo nome
+        </button>
+      )}
+
+      {busca && office && !finished && (
+        <BuscaCandidato office={office} candidates={candidates} onEscolher={onEscolher} onClose={() => setBusca(false)} />
+      )}
 
       {finished && colinha && (
         <ColinhaModal linhas={montarColinha(offices, votes, candidates)} onClose={() => setColinha(false)} />

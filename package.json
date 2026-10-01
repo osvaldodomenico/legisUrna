@@ -10,7 +10,8 @@
     "test": "vitest run",
     "dev:db": "tsx scripts/dev-db.ts",
     "dev:db:bg": "tsx scripts/dev-db.ts --background",
-    "dev:db:stop": "tsx scripts/dev-db.ts --stop"
+    "dev:db:stop": "tsx scripts/dev-db.ts --stop",
+    "importar:candidatos": "tsx scripts/importar-candidatos.ts"
   },
   "dependencies": {
     "framer-motion": "^13.4.4",

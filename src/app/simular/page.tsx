@@ -1,5 +1,5 @@
 import { STATES } from "@/data/states";
-import { MOCK_CANDIDATES } from "@/data/mock-candidates";
+import { CANDIDATOS } from "@/data/candidatos";
 import { VotingMachine } from "@/components/voting/VotingMachine";
 
 export const metadata = {
@@ -9,5 +9,5 @@ export const metadata = {
 
 export default function VotarPage() {
   const state = STATES[0];
-  return <VotingMachine stateCode={state.code} candidates={MOCK_CANDIDATES} />;
+  return <VotingMachine stateCode={state.code} candidates={CANDIDATOS} />;
 }

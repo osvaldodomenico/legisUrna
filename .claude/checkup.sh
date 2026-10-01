@@ -70,6 +70,15 @@ if grep -q "<ColinhaModal " src/components/urna/UrnaVoting.tsx && [ -f tests/col
 if grep -q "SIMULAÇÃO NÃO OFICIAL" src/components/colinha/Colinha.tsx; then pass "imagem da colinha leva o aviso NÃO OFICIAL"; else fail "imagem da colinha sem aviso NÃO OFICIAL"; fi
 if grep -qE "fetch\(|enviar" src/components/colinha/Colinha.tsx; then fail "colinha envia dados ao servidor"; else pass "colinha só no aparelho (sem envio)"; fi
 
+# -- candidatos do TSE + busca por nome --
+N=$(grep -o '"sq"' src/data/candidatos-sp.json | wc -l | tr -d ' ')
+if [ "$N" -gt 2000 ]; then pass "candidatos do TSE importados ($N)"; else fail "candidatos do TSE ausentes ($N)"; fi
+if grep -qE '"(cpf|email|titulo|nascimento|NR_CPF|DS_EMAIL)' src/data/candidatos-sp.json; then fail "candidatos-sp.json com dado pessoal"; else pass "candidatos-sp.json sem dado pessoal"; fi
+FALTA=$(python3 -c "import json,os;print(sum(1 for c in json.load(open('src/data/candidatos-sp.json')) if c['foto'] and not os.path.exists('public/candidates/tse/'+c['sq']+'.webp')))")
+if [ "$FALTA" -eq 0 ]; then pass "fotos do TSE presentes"; else fail "$FALTA fotos do TSE ausentes"; fi
+if grep -q "CANDIDATOS" src/app/simular/page.tsx src/app/api/simulacoes/route.ts src/app/apuracao/page.tsx && ! grep -q "MOCK_CANDIDATES" src/app/simular/page.tsx src/app/api/simulacoes/route.ts src/app/apuracao/page.tsx; then pass "urna, gravação e apuração usam a lista do TSE"; else fail "algum ponto do app ainda usa MOCK_CANDIDATES"; fi
+if grep -q "<BuscaCandidato " src/components/urna/UrnaVoting.tsx && [ -f tests/busca.test.ts ]; then pass "busca por nome na urna, com teste"; else fail "busca por nome ausente"; fi
+
 # -- divulga (client TSE, Fase 3) --
 [ -f src/lib/divulgacand/client.ts ] && pass "client divulgacand/client.ts" || fail "client divulgacand/client.ts ausente"
 [ -f src/lib/divulgacand/types.ts ] && pass "client divulgacand/types.ts" || fail "client divulgacand/types.ts ausente"

@@ -1,4 +1,4 @@
-import { MOCK_CANDIDATES } from "@/data/mock-candidates";
+import { CANDIDATOS } from "@/data/candidatos";
 import { db } from "@/lib/db";
 import { apurar } from "@/lib/apuracao/apurar";
 import { contarVotos, resumo } from "@/lib/apuracao/repo";
@@ -15,7 +15,7 @@ export default async function Apuracao() {
     return <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 text-sm">Banco não configurado (DATABASE_URL).</main>;
   }
   const [linhas, r] = await Promise.all([contarVotos(sql), resumo(sql)]);
-  const resultado = apurar(linhas, MOCK_CANDIDATES);
+  const resultado = apurar(linhas, CANDIDATOS);
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10">
