@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { montarColinha, textoWhatsapp } from "@/components/colinha/linhas";
 import { FULL_OFFICES } from "@/domain/voting/rules";
+import { rotuloCurto } from "@/components/colinha/desenhar";
 import { MOCK_CANDIDATES } from "@/data/mock-candidates";
 import type { Office, Vote } from "@/domain/voting/types";
 
@@ -44,5 +45,13 @@ describe("textoWhatsapp", () => {
       "Senador — 2ª vaga: 999 (nulo)", "",
       "Faça a sua: https://simulador.shiftlegis.com.br",
     ].join("\n"));
+  });
+});
+
+describe("rotuloCurto", () => {
+  it("encurta os cargos para a imagem", () => {
+    expect(FULL_OFFICES.map((o) => rotuloCurto(o.label))).toEqual([
+      "DEPUTADO FEDERAL", "DEPUTADO ESTADUAL", "1º SENADOR", "2º SENADOR", "GOVERNADOR", "PRESIDENTE",
+    ]);
   });
 });

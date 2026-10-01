@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useVotingSession } from "@/stores/voting-session";
 import { currentOffice } from "@/domain/voting/rules";
@@ -40,6 +40,8 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   const colinhaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const office = currentOffice(offices, currentIndex);
+  // Estável entre renderizações: o modal só redesenha a imagem quando os votos mudam.
+  const linhasColinha = useMemo(() => montarColinha(offices, votes, candidates), [offices, votes, candidates]);
   const stateName = STATES.find((s) => s.code === stateCode)?.name ?? null;
   const finished = started && status === "FINISHED";
   const view = toScreenView({ started, stateName, status, office, digits, foundCandidate });
@@ -176,7 +178,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
       )}
 
       {finished && colinha && (
-        <ColinhaModal linhas={montarColinha(offices, votes, candidates)} onClose={() => setColinha(false)} />
+        <ColinhaModal linhas={linhasColinha} onClose={() => setColinha(false)} />
       )}
 
       {finished && (

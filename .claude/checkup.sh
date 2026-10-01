@@ -67,7 +67,7 @@ if grep -rq "me quebra" src; then fail "brincadeira do 13 ainda presente"; else 
 
 # -- colinha (fim da votação) --
 if grep -q "<ColinhaModal " src/components/urna/UrnaVoting.tsx && [ -f tests/colinha.test.ts ]; then pass "colinha em modal no fim da votação, com teste"; else fail "colinha ausente no fim da votação"; fi
-if grep -q "SIMULAÇÃO NÃO OFICIAL" src/components/colinha/Colinha.tsx; then pass "imagem da colinha leva o aviso NÃO OFICIAL"; else fail "imagem da colinha sem aviso NÃO OFICIAL"; fi
+if grep -q "SIMULAÇÃO NÃO OFICIAL" src/components/colinha/desenhar.ts && grep -q "W = 1080, H = 1920" src/components/colinha/desenhar.ts; then pass "imagem da colinha 1080×1920 com aviso NÃO OFICIAL"; else fail "imagem da colinha sem aviso NÃO OFICIAL"; fi
 if grep -qE "fetch\(|enviar" src/components/colinha/Colinha.tsx; then fail "colinha envia dados ao servidor"; else pass "colinha só no aparelho (sem envio)"; fi
 
 if grep -q "ondevotar.shiftlegis.com.br" src/components/colinha/Colinha.tsx; then pass "colinha leva ao Onde Votar"; else fail "botão Onde Votar ausente na colinha"; fi
