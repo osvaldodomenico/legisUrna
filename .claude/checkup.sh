@@ -65,6 +65,11 @@ if grep -q "SAIR" src/lib/apuracao/consentimento.ts && grep -q "Não, obrigado" 
 if grep -rhE "from \"(@/lib/apuracao|\.)/payload\"" src/components src/lib/apuracao/enviar.ts | grep -qv "^import type"; then fail "zod no bundle do cliente"; else pass "cliente não importa validação do servidor"; fi
 if grep -rq "me quebra" src; then fail "brincadeira do 13 ainda presente"; else pass "brincadeira do 13 removida"; fi
 
+# -- colinha (fim da votação) --
+if grep -q "<Colinha " src/components/urna/UrnaVoting.tsx && [ -f tests/colinha.test.ts ]; then pass "colinha no fim da votação, com teste"; else fail "colinha ausente no fim da votação"; fi
+if grep -q "SIMULAÇÃO NÃO OFICIAL" src/components/colinha/Colinha.tsx; then pass "imagem da colinha leva o aviso NÃO OFICIAL"; else fail "imagem da colinha sem aviso NÃO OFICIAL"; fi
+if grep -qE "fetch\(|enviar" src/components/colinha/Colinha.tsx; then fail "colinha envia dados ao servidor"; else pass "colinha só no aparelho (sem envio)"; fi
+
 # -- divulga (client TSE, Fase 3) --
 [ -f src/lib/divulgacand/client.ts ] && pass "client divulgacand/client.ts" || fail "client divulgacand/client.ts ausente"
 [ -f src/lib/divulgacand/types.ts ] && pass "client divulgacand/types.ts" || fail "client divulgacand/types.ts ausente"

@@ -7,7 +7,9 @@ export type SafeEvent =
   | "correction_used"
   | "office_completed"
   | "simulation_completed"
-  | "simulation_abandoned";
+  | "simulation_abandoned"
+  | "colinha_saved"
+  | "colinha_shared";
 
 export function track(event: SafeEvent, props: Record<string, string | number | boolean> = {}): void {
   if (process.env.NODE_ENV === "development") {

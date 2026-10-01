@@ -9,6 +9,8 @@ import { track } from "@/lib/analytics";
 import { FIM_MS, sfx } from "@/lib/audio";
 import { enviarSimulacao } from "@/lib/apuracao/enviar";
 import { ContatoCard } from "@/components/contato/ContatoCard";
+import { Colinha } from "@/components/colinha/Colinha";
+import { montarColinha } from "@/components/colinha/linhas";
 import { toScreenView } from "./screen-view";
 import { UrnaShell } from "./UrnaShell";
 import { UrnaScreen } from "./UrnaScreen";
@@ -23,7 +25,7 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
   // `stateCode` vem por prop (não do store) para o "Estado: …" da tela de espera não piscar "SP"
   // no SSR enquanto o init() ainda não rodou.
   const {
-    offices, currentIndex, digits, status, foundCandidate, message,
+    offices, currentIndex, digits, status, foundCandidate, message, votes, candidates,
     pressDigit, pressBlank, pressCorrect, confirm, restart, isConfirmEnabled,
   } = useVotingSession();
 
@@ -153,6 +155,8 @@ export function UrnaVoting({ stateCode }: { stateCode: string }) {
       />
 
       {finished && convite && <ContatoCard />}
+
+      {finished && <Colinha linhas={montarColinha(offices, votes, candidates)} />}
 
       {finished && (
         <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
